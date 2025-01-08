@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Login from '../components/Login.vue';
+import PanelLayout from '../components/PanelLayout.vue';
 
 const routes = [
     {
@@ -8,6 +9,14 @@ const routes = [
         component: Login,
         meta: {
             layout: 'LoginLayout'
+        }
+    },
+    {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: PanelLayout,
+        meta: {
+            layout: 'PanelLayout'
         }
     }
 ];
