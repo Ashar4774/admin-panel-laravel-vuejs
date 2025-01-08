@@ -1,0 +1,55 @@
+/*.oblique{
+    transform: unset;
+}*/
+
+.navbar-vertical .navbar-nav>.nav-item .nav-link.active .icon{
+    background-image: linear-gradient(310deg, #7928ca, #17c1e8) !important;
+}
+
+.navbar-vertical .navbar-nav>.nav-item .nav-link.active .icon img{
+    filter: invert(1);
+}
+.bg-gradient-primary{
+    background-image: linear-gradient(310deg, #7928ca, #17c1e8) !important;
+}
+
+.error-help-block{
+    color: #d30303;
+    font-size: 14px;
+}
+
+#invoiceTable_wrapper, #clientTable_wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem .4rem;
+    gap: 10px;
+}
+
+#clientTable_wrapper table{
+    width: 100% !important;
+}
+
+a.paginate_button {
+    cursor: pointer;
+}
+
+.dataTables_paginate span {
+    margin: 0 5px;
+}
+
+span a.paginate_button.current {
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(310deg, #7928ca, #17c1e8) !important;
+}
+
+span a.paginate_button {
+    margin: 0 2px;
+    padding: 3px 10px;
+    border-radius: 50%;
+    background: linear-gradient(310deg, #7928ca, #17c1e8) !important;
+    color: white;
+
+
+}

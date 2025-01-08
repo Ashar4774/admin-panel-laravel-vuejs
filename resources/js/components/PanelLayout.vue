@@ -1,0 +1,18 @@
+<template>
+    <Sidebar />
+    <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg ">
+        <Navbar />
+        <h1>Welcome to Laravel Vuejs App</h1>
+        <p>Here we will configure complete Admin panel</p>
+    </main>
+</template>
+
+<script setup>
+import {defineAsyncComponent} from 'vue';
+const Navbar = defineAsyncComponent(()=>import('@/components/layouts/Navbar.vue'));
+const Sidebar = defineAsyncComponent(()=>import('@/components/layouts/Sidebar.vue'));
+</script>
+
+<style scoped>
+
+</style>
