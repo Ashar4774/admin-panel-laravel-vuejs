@@ -10,17 +10,22 @@
                                     <h3 class="font-weight-bolder text-info text-gradient">Welcome</h3>
                                 </div>
                                 <div class="card-body">
-                                    <form>
+                                    <ul v-for="error in formState.errors">
+                                        <p class="text-danger">
+                                            {{ error }}
+                                        </p>
+                                    </ul>
+                                    <form @submit.prevent="login">
                                         <label>Email</label>
                                         <div class="mb-3">
-                                            <input type="email" class="form-control" v-model="email" id="email" placeholder="Email" value="admin@crawley-accountant.com" aria-label="Email" aria-describedby="email-addon" required >
+                                            <input type="email" class="form-control" v-model="formState.email" id="email" placeholder="Email" value="admin@crawley-accountant.com" aria-label="Email" aria-describedby="email-addon" required >
                                         </div>
                                         <label>Password</label>
                                         <div class="mb-3">
-                                            <input type="password" class="form-control" v-model="password" id="password" placeholder="Password" value="secret" aria-label="Password" aria-describedby="password-addon">
+                                            <input type="password" class="form-control" v-model="formState.password" id="password" placeholder="Password" value="secret" aria-label="Password" aria-describedby="password-addon">
                                         </div>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="rememberMe" v-model="rememberMe" checked="">
+                                            <input class="form-check-input" type="checkbox" id="rememberMe" checked="">
                                             <label class="form-check-label" for="rememberMe">Remember me</label>
                                         </div>
                                         <div class="text-center">
@@ -52,5 +57,46 @@
 </template>
 
 <script setup>
+    import { reactive } from "vue";
+    import axios from "@/axios.js";
+    import { useRouter } from "vue-router";
+    import store from "@/state/index.js";
+
+    const router = useRouter();
+
+    const formState = reactive({
+        email : 'admin@google.com',
+        password: 'secret',
+        errors: []
+    });
+
+    const login = () => {
+        axios.get('/sanctum/csrf-cookie').then(response => {
+            axios.post('api/login', {
+                email: formState.email,
+                password: formState.password
+            }).then(response => {
+                const status = true;
+                const token = response.data.token;
+                if (store.getters.authToken) {
+                    window.axios.defaults.headers.common['Authentication'] = `Bearer ${store.getters.authToken}`;
+                }
+                store.dispatch('checkAuthStatus', status);
+                store.dispatch('setAuthToken', token);
+
+                router.push({
+                    name: 'dashboard'
+                })
+            }).catch(error => {
+                console.log(error);
+                if (error.response.status == 422) {
+                    formState.errors = Object.values(error.response.data.errors).flat()
+                } else {
+                    formState.errors = Object.values([error.response.data.errors]).flat()
+                }
+            });
+        });
+    }
+
 
 </script>

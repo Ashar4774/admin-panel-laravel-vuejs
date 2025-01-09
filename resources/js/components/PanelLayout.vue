@@ -8,9 +8,12 @@
 </template>
 
 <script setup>
-import {defineAsyncComponent} from 'vue';
+import {defineAsyncComponent, onMounted} from 'vue';
+import state from "@/state/index.js";
 const Navbar = defineAsyncComponent(()=>import('@/components/layouts/Navbar.vue'));
 const Sidebar = defineAsyncComponent(()=>import('@/components/layouts/Sidebar.vue'));
+
+
 </script>
 
 <style scoped>
