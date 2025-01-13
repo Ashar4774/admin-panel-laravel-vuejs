@@ -78,8 +78,8 @@
             }).then(response => {
                 const status = true;
                 const token = response.data.token;
-                if (store.getters.authToken) {
-                    window.axios.defaults.headers.common['Authentication'] = `Bearer ${store.getters.authToken}`;
+                if (store.state.token) {
+                    window.axios.defaults.headers.common['Authentication'] = `Bearer ${store.state.token}`;
                 }
                 store.dispatch('checkAuthStatus', status);
                 store.dispatch('setAuthToken', token);

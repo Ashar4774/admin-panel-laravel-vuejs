@@ -11,7 +11,7 @@
 <div class=" navbar-collapse  w-auto" id="sidenav-collapse-main">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <router-link class="nav-link " :to="{'name': 'dashboard'}">
+            <router-link class="nav-link " :to="{name: 'dashboard'}">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <title>shop </title>
@@ -31,7 +31,7 @@
             </router-link>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <router-link class="nav-link" :to="{name: 'client'}">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <title>customer-support</title>
@@ -49,20 +49,20 @@
                     </svg>
                 </div>
                 <span class="nav-link-text ms-1">Client</span>
-            </a>
+            </router-link>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <router-link class="nav-link" :to="{name: 'invoice'}">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <img src="{{asset('./assets/img/icons/invoice.png')}}" width="12px" height="12px" alt="invoice-img">
+                    <img src="/assets/img/icons/invoice.png" width="12px" height="12px" alt="invoice-img">
                 </div>
                 <span class="nav-link-text ms-1">Invoice</span>
-            </a>
+            </router-link>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <img src="{{asset('./assets/img/icons/balance-sheet.png')}}" width="12px" height="12px" alt="balance-sheet-img">
+                    <img src="/assets/img/icons/balance-sheet.png" style="max-width: unset; height: 12px;" alt="balance-sheet-img">
                 </div>
                 <span class="nav-link-text ms-1">State of Account(SOA)</span>
             </a>
@@ -70,7 +70,7 @@
         <li class="nav-item">
             <a class="nav-link " href="#">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <img src="{{asset('./assets/img/icons/setting.png')}}" width="12px" height="12px" alt="user-profile-img">
+                    <img src="/assets/img/icons/setting.png" width="12px" height="12px" alt="user-profile-img">
                 </div>
                 <span class="nav-link-text ms-1">User Profile</span>
             </a>

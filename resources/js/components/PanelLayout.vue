@@ -2,8 +2,7 @@
     <Sidebar />
     <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg ">
         <Navbar />
-        <h1>Welcome to Laravel Vuejs App</h1>
-        <p>Here we will configure complete Admin panel</p>
+        <router-view></router-view>
     </main>
 </template>
 
