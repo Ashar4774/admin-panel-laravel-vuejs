@@ -62,7 +62,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="pagination mt-3">
+                        <div class="pagination mt-3 justify-content-end pe-3 gap-3">
                             <button
                                 class="btn btn-sm btn-secondary"
                                 :disabled="pagination.current_page === 1"
@@ -211,9 +211,9 @@ import {ref, reactive, onMounted} from 'vue';
         await axios.get(`/api/clients?page=${page}`)
             .then(response=>{
                 clients.value = response.data.data;
-                pagination.value = ref({
+                pagination.value = reactive({
                     current_page: response.data.current_page,
-                    last_page: response.data.last,
+                    last_page: response.data.last_page,
                     total: response.data.total
                 });
 
