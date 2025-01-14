@@ -18,29 +18,66 @@
                         <div class="table-responsive p-0">
                             <table class="table align-items-center mb-0" id="clientTable">
                                 <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Ref #
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Name
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Arrears
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Bad Debts
-                                    </th>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Ref #
+                                        </th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Name
+                                        </th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Arrears
+                                        </th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Bad Debts
+                                        </th>
 
 
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Action
-                                    </th>
-                                </tr>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Action
+                                        </th>
+                                    </tr>
                                 </thead>
                                 <tbody>
+                                    <tr v-for="client in clients" :key="client.id">
+                                        <td class="ps-4">{{ client.ref_no }}</td>
+                                        <td>{{ client.name }}</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td class="text-center">
+                                            <a href="#" class="mx-3" data-bs-toggle="tooltip" title="View User">
+                                                <i class="fa-solid fa-eye text-secondary"></i>
+                                            </a>
+                                            <a href="#" class="" data-bs-toggle="tooltip" data-bs-original-title="State of Account">
+                                                <i class="fa-solid fa-file-invoice text-secondary"></i>
+                                            </a>
+                                            <a href="#" class="mx-3" @click="editClient(client.id)" data-bs-toggle="tooltip" data-bs-original-title="Edit User" data-id="{{ client.id  }}">
+                                                <i class="fas fa-user-edit text-secondary"></i>
+                                            </a>
+                                            <span>
+                                                <i class="cursor-pointer fas fa-trash text-secondary" @click="deleteClient(client.id)" id="deleteClient" data-bs-toggle="tooltip" data-bs-original-title="Delete User" data-id="{{ client.id  }}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="pagination mt-3">
+                            <button
+                                class="btn btn-sm btn-secondary"
+                                :disabled="pagination.current_page === 1"
+                                @click="changePage(pagination.current_page - 1)"
+                            >
+                                Previous
+                            </button>
+                            <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+                            <button
+                                class="btn btn-sm btn-secondary"
+                                :disabled="pagination.current_page === pagination.last_page"
+                                @click="changePage(pagination.current_page + 1)"
+                            >
+                                Next
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -58,28 +95,25 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="clientForm">
-                        <ul v-for="error in formState.errors">
-                            <p class="text-danger">
-                                {{ error }}
-                            </p>
-                        </ul>
+                    <form id="clientForm" @submit.prevent="AddClient">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <input type="number" class="form-control" id="ref_no" v-model="formState.ref_no" placeholder="e.g. 101">
+                                    <span v-if="formState.errors.ref_no" class="text-danger ps-2">{{ formState.errors.ref_no }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <input type="text" class="form-control" id="client_name" v-model="formState.client_name" placeholder="e.g. Afzal">
+                                    <span v-if="formState.errors.client_name" class="text-danger ps-2">{{ formState.errors.client_name }}</span>
                                 </div>
                             </div>
 
                         </div>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn bg-gradient-secondary" @click="closeClientAddModal">Close</button>
-                            <button type="submit" id="submitClientBtn" class="btn bg-gradient-success" @click="AddClient">Add</button>
+                            <button type="submit" id="submitClientBtn" class="btn bg-gradient-success">Add</button>
                         </div>
                     </form>
                 </div>
@@ -88,20 +122,127 @@
     </div>
 <!--    End add client modal-->
 
+<!--    Edit client modal-->
+    <div v-if="isClientUpdateModalOpen" class="modal" id="addClientModel" aria-labelledby="addClientModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClientModelLabel">Update Client</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeClientUpdateModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="clientForm" @submit.prevent="UpdateClient">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="client_id" v-model="formState.id" placeholder="e.g. 101">
+                                    <input type="number" class="form-control" id="ref_no" v-model="formState.ref_no" placeholder="e.g. 101">
+                                    <span v-if="formState.errors.id" class="text-danger ps-2">{{ formState.errors.id }}</span>
+                                    <span v-if="formState.errors.ref_no" class="text-danger ps-2">{{ formState.errors.ref_no }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="client_name" v-model="formState.client_name" placeholder="e.g. Afzal">
+                                    <span v-if="formState.errors.client_name" class="text-danger ps-2">{{ formState.errors.client_name }}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn bg-gradient-secondary" @click="closeClientUpdateModal">Close</button>
+                            <button type="submit" id="submitClientBtn" class="btn bg-gradient-success">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--    End edit client modal-->
+
+<!--    Delete client modal-->
+    <div v-if="isClientDeleteModalOpen" class="modal" id="addClientModel" aria-labelledby="addClientModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteClientModelLabel">Delete Client</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeClientDeleteModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" @submit.prevent="deleteClientForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="client_id" v-model="formState.id">
+                                    <p class="client_alert">{{client_alert}}</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <button type="button" class="btn bg-gradient-danger" @click="closeClientDeleteModal">No</button>
+                            <button type="submit" id="deleteClientBtn" class="btn bg-gradient-success">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--    End Delete client modal-->
+
 </template>
 
 <script setup>
-    import { ref, reactive } from 'vue';
+import {ref, reactive, onMounted} from 'vue';
     import axios from "@/axios.js";
     import store from "@/state/index.js";
 
+    const clients = ref([]);
+    const pagination = ref({
+        current_page: 1,
+        last_page: 1,
+        total: 0
+    });
+
+
+    const fetchClients = async (page=1) => {
+        await axios.get(`/api/clients?page=${page}`)
+            .then(response=>{
+                clients.value = response.data.data;
+                pagination.value = ref({
+                    current_page: response.data.current_page,
+                    last_page: response.data.last,
+                    total: response.data.total
+                });
+
+                console.log(response.data)
+            }).catch(error=>{
+
+            })
+    }
+
+    const changePage = (page) => {
+        if(page !== pagination.value.current_page){
+            fetchClients(page);
+        }
+    }
+
+    onMounted(()=>{
+        fetchClients();
+    });
+
     const formState = reactive({
+        id: '',
         ref_no: '',
         client_name: '',
-        errors: []
+        errors: {}
     })
 
     const isClientAddModalOpen = ref(false)
+    const isClientUpdateModalOpen = ref(false)
+    const isClientDeleteModalOpen = ref(false)
 
     const addClientModel = () => {
         isClientAddModalOpen.value = true
@@ -117,19 +258,117 @@
                 ref_no: formState.ref_no,
                 client_name: formState.client_name
             }).then(response => {
-                alert(response);
-                console.log(response)
+                console.log(response);
+                fetchClients();
+                formState.ref_no = '';
+                formState.client_name = '';
             }).catch(error => {
-                alert(error);
-                console.error(error)
                 if (error.response.status == 422) {
-                    formState.errors = Object.values(error.response.data.errors).flat()
+                    formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                        acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                        return acc;
+                    }, {});
                 } else {
-                    formState.errors = Object.values([error.response.data.errors]).flat()
+                    formState.errors = {
+                        general: 'An unexpected error occurred. Please try again later.'
+                    };
                 }
             })
         // });
     }
+
+    // --------------Update client module-----------
+    const editClient = async (id) => {
+        await axios.get(`/api/clients/${id}`)
+            .then(response=>{
+                console.log(response.data.client)
+                if(response.status === 201 && response.data.client){
+                    formState.id = response.data.client.id;
+                    formState.ref_no = response.data.client.ref_no;
+                    formState.client_name = response.data.client.name;
+
+
+                } else {
+                    console.error('Client data not found or invalid status:', response.data);
+                }
+            }).catch(error=>{
+                console.log(error)
+            })
+        isClientUpdateModalOpen.value = true
+    }
+
+    const closeClientUpdateModal = () => {
+        isClientUpdateModalOpen.value = false
+    }
+
+    const UpdateClient = () => {
+        axios.put(`/api/clients/${formState.id}`, {
+            ref_no: formState.ref_no,
+            client_name: formState.client_name
+        }).then(response=>{
+            if(response.status === 201 && response.data.client) {
+                fetchClients();
+                formState.ref_no = '';
+                formState.client_name = '';
+            }
+        }).catch(error=>{
+            if (error.response.status == 422) {
+                formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                    acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            } else {
+                formState.errors = {
+                    general: 'An unexpected error occurred. Please try again later.'
+                };
+            }
+        })
+    }
+
+    // ---------------End update client module-----------
+
+    // Delete client module
+
+    const client_alert = ref('');
+    const deleteClient = async (id) => {
+        alert(id);
+        formState.id = id;
+        await axios.get(`/api/clients/${id}`)
+            .then(response=> {
+                client_alert.value = `Do you really want to delete user with ref: ${response.data.client.ref_no} ?`;
+                isClientDeleteModalOpen.value = true;
+
+            }).catch(error => {
+
+            })
+    }
+    const deleteClientForm = async () => {
+        await axios.delete(`/api/clients/${formState.id}`)
+            .then(response=>{
+                console.log(response)
+                if(response.status === 201) {
+                    fetchClients();
+                    closeClientDeleteModal();
+                }
+            }).catch(error=>{
+                console.error(error)
+                if (error.response.status == 422) {
+                    formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                        acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                        return acc;
+                    }, {});
+                } else {
+                    formState.errors = {
+                        general: 'An unexpected error occurred. Please try again later.'
+                    };
+                }
+            })
+    }
+
+    const closeClientDeleteModal = () => {
+        isClientDeleteModalOpen.value = false
+    }
+    // End Delete client module
 </script>
 
 <style>

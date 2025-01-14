@@ -31,7 +31,7 @@ class ClientRequest extends FormRequest
     {
         return [
             'ref_no.required' => 'Ref. # is required',
-            'ref_no.unique' => 'Ref. # should be required',
+            'ref_no.unique' => 'Ref. # should be unique',
             'client_name.required' => 'Name is required',
         ];
     }
