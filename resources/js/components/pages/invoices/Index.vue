@@ -12,7 +12,6 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <form method="POST" id="filterInvoiceForm" class="p-4">
-                            @csrf
                             <div class="row">
                                 <div class="col-md-2">
                                     <div class="form-group">

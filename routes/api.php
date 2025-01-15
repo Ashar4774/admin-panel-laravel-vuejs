@@ -15,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('checkAuthStatus', [AuthController::class, 'checkAuthStatus'])->name('checkAuthStatus');
 //    Route::post('clients/store', [ClientController::class, 'store']);
+    Route::post('clients/import', [ClientController::class, 'import']);
     Route::apiResource('clients', ClientController::class);
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

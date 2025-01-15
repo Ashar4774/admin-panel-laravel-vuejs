@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\v1\Client\ClientImportRequest;
 use App\Http\Requests\API\v1\Client\ClientRequest;
+use App\Imports\CLientDetailImport;
 use App\Models\Client;
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ClientController extends Controller
 {
@@ -17,6 +20,23 @@ class ClientController extends Controller
     {
         $clients = Client::orderBy('updated_at', 'desc')->paginate(10);
         return response()->json($clients);
+    }
+
+    public function import(ClientImportRequest $request)
+    {
+        try {
+            Excel::import(new CLientDetailImport, $request->file('client_file'));
+
+            return response()->json([
+                'message' => 'Client record imported successfully.'
+            ], 200);
+        } catch(\Exception $e){
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'There is an error while uploading file. Please try again later'
+            ]);
+        }
+
     }
 
     /**

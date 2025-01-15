@@ -9,7 +9,7 @@
                                 <h5 class="mb-0">All Clients</h5>
                             </div>
                             <div class="d-flex flex-row">
-                                <a href="#" class="btn bg-gradient-faded-info btn-sm mb-0 text-white mx-1" type="button" data-bs-toggle="modal" data-bs-target="#importClientModel">Import User(s)</a>
+                                <a href="#" class="btn bg-gradient-faded-info btn-sm mb-0 text-white mx-1" type="button" @click="importClientModel">Import User(s)</a>
                                 <a href="#" class="btn bg-gradient-primary btn-sm mb-0" id="addClient" type="button" @click="addClientModel">+&nbsp; New Client</a>
                             </div>
                         </div>
@@ -39,7 +39,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="client in clients" :key="client.id">
+                                    <tr v-if="clients" v-for="client in clients" :key="client.id">
                                         <td class="ps-4">{{ client.ref_no }}</td>
                                         <td>{{ client.name }}</td>
                                         <td>0</td>
@@ -58,6 +58,9 @@
                                                 <i class="cursor-pointer fas fa-trash text-secondary" @click="deleteClient(client.id)" id="deleteClient" data-bs-toggle="tooltip" data-bs-original-title="Delete User" data-id="{{ client.id  }}"></i>
                                             </span>
                                         </td>
+                                    </tr>
+                                    <tr v-else>
+                                        <td colspan="5">No record found.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -192,6 +195,44 @@
     </div>
 <!--    End Delete client modal-->
 
+<!--    Import client modal-->
+    <div v-if="isClientImportModalOpen" class="modal" id="importClientModel" tabindex="-1" role="dialog" aria-labelledby="importClientModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importClientModelLabel">Import File</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeClientImportModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="importClientForm" enctype="multipart/form-data" @submit.prevent="importClientForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="file" class="" id="client_file" @change="handleFileChange">
+                                    <small v-if="formState.errors.client_file" class="error text-danger">
+                                        {{ formState.errors.client_file }}
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <button type="submit" id="submitImportClientBtn" class="btn bg-gradient-success">Import</button>
+
+                            <div id="loader" style="display: none; margin-left: 10px;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--    End Import client modal-->
+
 </template>
 
 <script setup>
@@ -237,13 +278,16 @@ import {ref, reactive, onMounted} from 'vue';
         id: '',
         ref_no: '',
         client_name: '',
+        client_file: '',
         errors: {}
     })
 
     const isClientAddModalOpen = ref(false)
     const isClientUpdateModalOpen = ref(false)
     const isClientDeleteModalOpen = ref(false)
+    const isClientImportModalOpen = ref(false)
 
+    // --------------Add client module-------------
     const addClientModel = () => {
         isClientAddModalOpen.value = true
     }
@@ -276,6 +320,7 @@ import {ref, reactive, onMounted} from 'vue';
             })
         // });
     }
+    // --------------End Add client module---------
 
     // --------------Update client module-----------
     const editClient = async (id) => {
@@ -327,7 +372,7 @@ import {ref, reactive, onMounted} from 'vue';
 
     // ---------------End update client module-----------
 
-    // Delete client module
+    // ---------------Delete client module---------------
 
     const client_alert = ref('');
     const deleteClient = async (id) => {
@@ -368,7 +413,49 @@ import {ref, reactive, onMounted} from 'vue';
     const closeClientDeleteModal = () => {
         isClientDeleteModalOpen.value = false
     }
-    // End Delete client module
+    // ---------------End Delete client module-----------
+
+
+    // ---------------Import client module---------------
+
+    const importClientModel = () => {
+        isClientImportModalOpen.value = true
+    }
+    const closeClientImportModal = () => {
+        isClientImportModalOpen.value = false
+    }
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            formState.client_file = file; // Update the file in the form state
+        }
+    }
+    const importClientForm = async () => {
+        await axios.post('/api/clients/import',{
+            client_file: formState.client_file
+        },{
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }).then(response=>{
+            fetchClients();
+            closeClientImportModal();
+        }).catch(error=>{
+            console.error(error)
+            if (error.response.status == 422) {
+                formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                    acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            } else {
+                formState.errors = {
+                    general: 'An unexpected error occurred. Please try again later.'
+                };
+            }
+        })
+    }
+    // ---------------End Import client module-----------
 </script>
 
 <style>
