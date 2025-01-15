@@ -89,83 +89,15 @@
     </div>
 
 <!--    Add client modal-->
-    <div v-if="isClientAddModalOpen" class="modal" id="addClientModel" aria-labelledby="addClientModelLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addClientModelLabel">Add Client</h5>
-                    <button type="button" class="btn-close bg-dark" @click="closeClientAddModal">
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="clientForm" @submit.prevent="AddClient">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="number" class="form-control" id="ref_no" v-model="formState.ref_no" placeholder="e.g. 101">
-                                    <span v-if="formState.errors.ref_no" class="text-danger ps-2">{{ formState.errors.ref_no }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="client_name" v-model="formState.client_name" placeholder="e.g. Afzal">
-                                    <span v-if="formState.errors.client_name" class="text-danger ps-2">{{ formState.errors.client_name }}</span>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn bg-gradient-secondary" @click="closeClientAddModal">Close</button>
-                            <button type="submit" id="submitClientBtn" class="btn bg-gradient-success">Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ClientAddModal :isClientAddModalOpen="isClientAddModalOpen" :formState="formState" @close="closeClientAddModal" @clientAdded="fetchClients"/>
 <!--    End add client modal-->
 
 <!--    Edit client modal-->
-    <div v-if="isClientUpdateModalOpen" class="modal" id="addClientModel" aria-labelledby="addClientModelLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addClientModelLabel">Update Client</h5>
-                    <button type="button" class="btn-close bg-dark" @click="closeClientUpdateModal">
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="clientForm" @submit.prevent="UpdateClient">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="hidden" class="form-control" id="client_id" v-model="formState.id" placeholder="e.g. 101">
-                                    <input type="number" class="form-control" id="ref_no" v-model="formState.ref_no" placeholder="e.g. 101">
-                                    <span v-if="formState.errors.id" class="text-danger ps-2">{{ formState.errors.id }}</span>
-                                    <span v-if="formState.errors.ref_no" class="text-danger ps-2">{{ formState.errors.ref_no }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="client_name" v-model="formState.client_name" placeholder="e.g. Afzal">
-                                    <span v-if="formState.errors.client_name" class="text-danger ps-2">{{ formState.errors.client_name }}</span>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn bg-gradient-secondary" @click="closeClientUpdateModal">Close</button>
-                            <button type="submit" id="submitClientBtn" class="btn bg-gradient-success">Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ClientUpdateModal :isClientUpdateModalOpen="isClientUpdateModalOpen" :formState="formState" @close="closeClientUpdateModal" @fetchClients="fetchClients"   />
 <!--    End edit client modal-->
 
 <!--    Delete client modal-->
-    <div v-if="isClientDeleteModalOpen" class="modal" id="addClientModel" aria-labelledby="addClientModelLabel" aria-hidden="true">
+<!--    <div v-if="isClientDeleteModalOpen" class="modal" id="addClientModel" aria-labelledby="addClientModelLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -192,7 +124,8 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
+    <ClientDeleteModal  :formState="formState" :isClientDeleteModalOpen="isClientDeleteModalOpen" @close="closeClientDeleteModal" @fetchClients="fetchClients" />
 <!--    End Delete client modal-->
 
 <!--    Import client modal-->
@@ -236,9 +169,12 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted} from 'vue';
+import {ref, reactive, onMounted, nextTick} from 'vue';
     import axios from "@/axios.js";
     import store from "@/state/index.js";
+    import ClientAddModal from "@/components/pages/clients/partials/ClientAddModal.vue";
+    import ClientUpdateModal from "@/components/pages/clients/partials/ClientUpdateModal.vue";
+    import ClientDeleteModal from "@/components/pages/clients/partials/ClientDeleteModal.vue";
 
     const clients = ref([]);
     const pagination = ref({
@@ -289,36 +225,14 @@ import {ref, reactive, onMounted} from 'vue';
 
     // --------------Add client module-------------
     const addClientModel = () => {
-        isClientAddModalOpen.value = true
+        isClientAddModalOpen.value = true;
+
     }
 
     const closeClientAddModal = () => {
+        formState.ref_no = '';
+        formState.client_name = '';
         isClientAddModalOpen.value = false
-    }
-
-    const AddClient = () => {
-        // axios.get('/sanctum/csrf-cookie').then(response => {
-            axios.post('/api/clients', {
-                ref_no: formState.ref_no,
-                client_name: formState.client_name
-            }).then(response => {
-                console.log(response);
-                fetchClients();
-                formState.ref_no = '';
-                formState.client_name = '';
-            }).catch(error => {
-                if (error.response.status == 422) {
-                    formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
-                        acc[field] = error.response.data.errors[field][0]; // Get the first error message
-                        return acc;
-                    }, {});
-                } else {
-                    formState.errors = {
-                        general: 'An unexpected error occurred. Please try again later.'
-                    };
-                }
-            })
-        // });
     }
     // --------------End Add client module---------
 
@@ -331,7 +245,7 @@ import {ref, reactive, onMounted} from 'vue';
                     formState.id = response.data.client.id;
                     formState.ref_no = response.data.client.ref_no;
                     formState.client_name = response.data.client.name;
-
+                    isClientUpdateModalOpen.value = true
 
                 } else {
                     console.error('Client data not found or invalid status:', response.data);
@@ -339,42 +253,19 @@ import {ref, reactive, onMounted} from 'vue';
             }).catch(error=>{
                 console.log(error)
             })
-        isClientUpdateModalOpen.value = true
+
     }
 
     const closeClientUpdateModal = () => {
+        formState.ref_no = '';
+        formState.client_name = '';
         isClientUpdateModalOpen.value = false
     }
-
-    const UpdateClient = () => {
-        axios.put(`/api/clients/${formState.id}`, {
-            ref_no: formState.ref_no,
-            client_name: formState.client_name
-        }).then(response=>{
-            if(response.status === 201 && response.data.client) {
-                fetchClients();
-                formState.ref_no = '';
-                formState.client_name = '';
-            }
-        }).catch(error=>{
-            if (error.response.status == 422) {
-                formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
-                    acc[field] = error.response.data.errors[field][0]; // Get the first error message
-                    return acc;
-                }, {});
-            } else {
-                formState.errors = {
-                    general: 'An unexpected error occurred. Please try again later.'
-                };
-            }
-        })
-    }
-
     // ---------------End update client module-----------
 
     // ---------------Delete client module---------------
 
-    const client_alert = ref('');
+
     const deleteClient = async (id) => {
         alert(id);
         formState.id = id;
@@ -387,7 +278,7 @@ import {ref, reactive, onMounted} from 'vue';
 
             })
     }
-    const deleteClientForm = async () => {
+    /*const deleteClientForm = async () => {
         await axios.delete(`/api/clients/${formState.id}`)
             .then(response=>{
                 console.log(response)
@@ -408,7 +299,7 @@ import {ref, reactive, onMounted} from 'vue';
                     };
                 }
             })
-    }
+    }*/
 
     const closeClientDeleteModal = () => {
         isClientDeleteModalOpen.value = false
