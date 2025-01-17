@@ -13,7 +13,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <input type="hidden" class="form-control" id="client_id" v-model="formState.id">
-                                    <p class="client_alert">{{client_alert}}</p>
+                                    <p class="client_alert">{{props.client_alert}}</p>
                                 </div>
                             </div>
 
@@ -33,12 +33,12 @@
 import {ref} from "vue";
 
 const emit = defineEmits(['close', 'fetchClients'])
-const props = defineProps(['formState', 'isClientDeleteModalOpen'])
+const props = defineProps(['formState', 'isClientDeleteModalOpen', 'client_alert'])
 const closeClientDeleteModal = () => {
     emit('close')
 }
 
-const client_alert = ref('');
+
 
 const deleteClientForm = () => {
     axios.delete(`/api/clients/${props.formState.id}`)
