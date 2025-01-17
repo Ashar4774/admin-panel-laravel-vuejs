@@ -118,8 +118,8 @@
                                 <h5 class="mb-0">All Invoices</h5>
                             </div>
                             <div class="d-flex flex-row">
-                                <a href="#" class="btn bg-gradient-faded-info btn-sm mb-0 text-white mx-1" type="button" data-bs-toggle="modal" data-bs-target="#importInvoiceModel">Import Invoice(s)</a>
-                                <a href="#" class="btn bg-gradient-primary btn-sm mb-0" id="addInvoice" type="button" data-bs-toggle="modal" data-bs-target="#addInvoiceModel">+&nbsp; New Invoice</a>
+                                <a href="#" class="btn bg-gradient-faded-info btn-sm mb-0 text-white mx-1" @click="importInvoiceModelOpen" type="button" >Import Invoice(s)</a>
+                                <a href="#" class="btn bg-gradient-primary btn-sm mb-0" id="addInvoice" @click="addInvoiceModelOpen" type="button">+&nbsp; New Invoice</a>
                             </div>
                         </div>
                     </div>
@@ -194,8 +194,172 @@
             </div>
         </div>
     </div>
+
+<!--    Modal for Add invoice-->
+    <div v-if="addInvoiceModel" class="modal" id="addInvoiceModel" tabindex="-1" role="dialog" aria-labelledby="addInvoiceModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addInvoiceModelLabel">Create Invoice</h5>
+                    <button type="button" class="btn-close bg-dark" @click="addInvoiceModelClose">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="invoiceForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-sm" id="invoice_year" name="invoice_year" placeholder="Year of Invoice" maxlength="5">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" name="clients_id" placeholder="Client Ref No.">
+                                    <datalist id="clientList" >
+<!--                                        @foreach($clients as $client)
+                                        <option value="{{ $client->ref_no }}" data-ref="{{ $client->name }}" data-id="{{ $client->id }}">{{ $client->ref_no }}</option>
+                                        @endforeach-->
+                                    </datalist>
+                                    <input type="number" class="form-control form-control-sm d-none" id="inv_clients_id" name="clients_id" placeholder="Client Ref No." readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input name="inv_client_name" id="inv_client_name" class="form-control form-control-sm" placeholder="Select Client" autocomplete="off" readonly>
+
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="number" class="form-control form-control-sm" id="amount" name="amount" placeholder="Amount" >
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="date" class="form-control form-control-sm" id="due_date" name="due_date" placeholder="Due Date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="number" class="form-control form-control-sm" id="rcd_amount" name="rcd_amount" placeholder="Received Amount" >
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="date" class="form-control form-control-sm" id="rcd_due_date" name="rcd_due_date" placeholder="Received Date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <select class="form-control form-control-sm" name="status" id="status">
+                                        <option disabled selected>Select client status</option>
+                                        <option value="bad_debts">Bad debt</option>
+                                        <option value="good">Good debt</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <select class="form-control form-control-sm" name="payment_type" id="payment_type">
+                                        <option disabled selected>Select payment type</option>
+                                        <option value="bank">Bank</option>
+                                        <option value="cash">Cash</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="number" class="form-control form-control-sm" id="bad_debt_amount" name="bad_debt_amount" placeholder="Bad Debt. Amount" >
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <textarea class="form-control form-control-sm" name="notes" id="notes"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <button type="button" class="btn bg-gradient-secondary" @click="addInvoiceModelClose">Close</button>
+                            <button type="submit" id="submitInvoiceBtn" class="btn bg-gradient-success">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--    End Modal for Add invoice-->
+
+<!--    Modal for Import Invoice-->
+<!--    <div class="modal fade" id="importInvoiceModel" tabindex="-1" role="dialog" aria-labelledby="importInvoiceModelLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importInvoiceModelLabel">Import File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="importInvoiceForm" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="file" class="" id="invoice_file" name="invoice_file">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <button type="submit" id="submitImportInvoiceBtn" class="btn bg-gradient-success">Import</button>
+
+                            <div id="loader" style="display: none; margin-left: 10px;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>-->
+<!--    End Modal for Import Invoice-->
 </template>
 
 <script setup>
+import {ref} from "vue";
 
+const addInvoiceModel = ref(false)
+
+const addInvoiceModelOpen = () => {
+    addInvoiceModel.value = true
+}
+
+const addInvoiceModelClose = () => {
+    addInvoiceModel.value = false
+}
 </script>
+
+<style scoped>
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+</style>
