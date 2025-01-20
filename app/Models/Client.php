@@ -10,4 +10,8 @@ class Client extends Model
         'ref_no',
         'name'
     ];
+
+    public function invoices(){
+        return $this->hasMany(Invoice::class, 'clients_id');
+    }
 }

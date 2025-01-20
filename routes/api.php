@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\AuthController;
 use App\Http\Controllers\API\v1\ClientController;
+use App\Http\Controllers\API\v1\InvoiceController;
 
 //Route::get('/user', function (Request $request) {
 //    return $request->user();
@@ -17,5 +18,8 @@ Route::middleware('auth:sanctum')->group(function(){
 //    Route::post('clients/store', [ClientController::class, 'store']);
     Route::post('clients/import', [ClientController::class, 'import']);
     Route::apiResource('clients', ClientController::class);
+
+    Route::get('invoices/fetchClients', [InvoiceController::class, 'fetchClients'])->name('fetchClients');
+    Route::apiResource('invoices', InvoiceController::class);
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
