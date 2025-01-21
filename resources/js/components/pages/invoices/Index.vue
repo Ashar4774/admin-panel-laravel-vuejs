@@ -228,8 +228,8 @@
     </div>
 
 <!--    Modal for Add invoice-->
-<!--    <InvoiceAddModal :addInvoiceModel="addInvoiceModel" :formState="formState" @close="addInvoiceModelClose" @fetchInvoices="fetchInvoices" @fetchClients="fetchClients" />-->
-    <div v-if="addInvoiceModel" class="modal" id="addInvoiceModel">
+    <InvoiceAddModal :addInvoiceModel="addInvoiceModel" :formState="formState" @close="addInvoiceModelClose" @fetchInvoices="fetchInvoices" @fetchClients="fetchClients" />
+<!--    <div v-if="addInvoiceModel" class="modal" id="addInvoiceModel">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -250,7 +250,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-<!--                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">-->
+&lt;!&ndash;                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">&ndash;&gt;
                                     <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref">
                                         <option value="" disabled selected>Select client</option>
                                         <option v-for="client in clients"
@@ -334,7 +334,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 
     <!--    End Modal for Add invoice-->
 
@@ -430,7 +430,7 @@ onMounted(() => {
     fetchInvoices();
 })
 
-const inv_clients_ref = (e) => {
+/*const inv_clients_ref = (e) => {
     const selectedRefNo = e.target.value;
     const selectedClient = clients.value.find(client => client.ref_no === selectedRefNo);
 
@@ -441,7 +441,7 @@ const inv_clients_ref = (e) => {
         formState.clients_id = ''; // Reset if no valid client is selected
         document.getElementById('inv_client_name').value = '';
     }
-}
+}*/
 
 const fetchInvoices = async (page) => {
     await axios.get(`/api/invoices?page=${page}`)
@@ -476,7 +476,7 @@ const addInvoiceModelClose = () => {
     addInvoiceModel.value = false
 };
 
-const AddInvoiceForm = async () => {
+/*const AddInvoiceForm = async () => {
     await axios.post('/api/invoices', {
         invoice_year: formState.invoice_year,
         clients_id: formState.clients_id,
@@ -513,7 +513,7 @@ const AddInvoiceForm = async () => {
             };
         }
     })
-};
+};*/
 </script>
 
 <style scoped>

@@ -110,10 +110,12 @@
 <script setup>
 
 import axios from "@/axios.js";
+import {ref} from "vue";
 
 const prop = defineProps(['addInvoiceModel', 'formState'])
 const emit = defineEmits(['close', 'fetchInvoices', 'fetchClients'])
 
+const clients = ref([]);
 const inv_clients_ref = (e) => {
     const selectedRefNo = e.target.value;
     const selectedClient = clients.value.find(client => client.ref_no === selectedRefNo);
@@ -131,9 +133,16 @@ const addInvoiceModelClose = () => {
     emit('close')
 }
 
-const clients = () => {
+const fetchClients = () => {
     emit('fetchClients');
+    // console.log("clients function in child component:");
+    // console.log(emit('fetchClients'));
 }
+
+const fetchInvoices = () => {
+    emit('fetchInvoices');
+}
+
 
 const AddInvoiceForm = async () => {
     await axios.post('/api/invoices', {
@@ -149,6 +158,7 @@ const AddInvoiceForm = async () => {
         notes: prop.formState.notes,
     }).then(response=>{
         console.log(response.data.message);
+        fetchInvoices();
         addInvoiceModelClose();
             prop.formState.invoice_year.value= '',
             prop.formState.clients_id.value= '',
