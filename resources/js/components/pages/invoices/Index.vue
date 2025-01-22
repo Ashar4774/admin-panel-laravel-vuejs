@@ -177,36 +177,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="invoice in invoices" :key="invoice.id" class="text-center text-capitalize" :class="invoice.rcd_amount == null ? (invoice.status == 'bad_debts' ? 'bg-gradient-danger text-white' : 'bg-gradient-secondary text-white') : (invoice.status == 'bad_debts' ? 'bg-gradient-danger text-white' : 'bg-gradient-success text-white')">
-                                        <td>{{ invoice.id }}</td>
-                                        <td>{{ invoice.clients.ref_no }}</td>
-                                        <td>{{ invoice.clients.name }}</td>
-                                        <td>{{ invoice.amount }}</td>
-                                        <td>{{ invoice.formatted_due_date }}</td>
-                                        <td>{{ invoice.invoice_year }}</td>
-                                        <td>{{ invoice.rcd_amount ?? 0 }}</td>
-                                        <td>{{ invoice.formatted_rcd_due_date ?? '-' }}</td>
-                                        <td>{{ invoice.rcd_due_date ? invoice.time_gap : '-' }}</td>
-                                        <td>{{ invoice.bad_debt_amount ?? 0 }}</td>
-                                        <td>{{ invoice.status }}</td>
-                                        <td>{{ invoice.payment_type ?? '-' }}</td>
-                                        <td>{{ invoice.notes ?? '-' }}</td>
-                                        <td>{{ (invoice.rcd_amount != null || invoice.bad_debt_amount != null) ? 'Paid' : 'Unpaid' }}</td>
-                                        <td class="text-center text-white">
-                                            <a href="#" :class="( invoice.rcd_amount == null && invoice.bad_debt_amount == null ) ? 'mx-2' : '' " data-bs-toggle="tooltip" title="View Invoice">
-                                                <i class="fa-solid fa-eye text-white-50"></i>
-                                            </a>
-                                            <a v-if="invoice.rcd_amount == null && invoice.bad_debt_amount == null" href="#" class="" id="payInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Pay Invoice">
-                                                <i class="fa-solid fa-file-invoice text-white-50"></i>
-                                            </a>
-                                            <a href="#" class="mx-2" id="editInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Edit Invoice">
-                                                <i class="fas fa-user-edit text-white-50"></i>
-                                            </a>
-                                            <span>
-                                                <i class="cursor-pointer fas fa-trash text-white-50" id="deleteInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Delete Invoice"></i>
-                                            </span>
-                                        </td>
-                                    </tr>
+                                    <FetchInvoices :invoices="invoices" :deleteInvoiceModelOpen="deleteInvoiceModelOpen" :editInvoice="editInvoice" />
                                 </tbody>
                             </table>
                         </div>
@@ -228,115 +199,39 @@
     </div>
 
 <!--    Modal for Add invoice-->
-    <InvoiceAddModal :addInvoiceModel="addInvoiceModel" :formState="formState" @close="addInvoiceModelClose" @fetchInvoices="fetchInvoices" @fetchClients="fetchClients" />
-<!--    <div v-if="addInvoiceModel" class="modal" id="addInvoiceModel">
+    <InvoiceAddModal :addInvoiceModel="addInvoiceModel" :formState="formState" :clients="clients" @close="addInvoiceModelClose" @fetchInvoices="fetchInvoices"  />
+<!--    End Modal for Add invoice-->
+
+<!-- Modal for Delete invoice -->
+    <div v-if="deleteInvoiceModel" class="modal" id="deleteInvoiceModel">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addInvoiceModelLabel">Create Invoice</h5>
-                    <button type="button" class="btn-close bg-dark" @click="addInvoiceModelClose">
+                    <h5 class="modal-title" id="deleteInvoiceModelLabel">Delete Invoice</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeDeleteInvoiceModel">
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" id="invoiceForm" @submit.prevent="AddInvoiceForm">
+                    <form method="POST" id="deleteInvoiceForm">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="text" class="form-control form-control-sm" id="invoice_year" v-model="formState.invoice_year" placeholder="Year of Invoice" maxlength="5">
-                                    <span v-if="formState.errors.invoice_year" class="text-sm text-danger ps-2">{{ formState.errors.invoice_year }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-&lt;!&ndash;                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">&ndash;&gt;
-                                    <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref">
-                                        <option value="" disabled selected>Select client</option>
-                                        <option v-for="client in clients"
-                                                :value="client.ref_no"
-                                                :data-ref="client.name"
-                                                :data-id="client.id">{{ client.ref_no }}</option>
-                                    </select>
-                                    <span v-if="formState.errors.clients_id" class="text-sm text-danger ps-2">{{ formState.errors.clients_id }}</span>
-                                    <input type="number" class="form-control form-control-sm d-none" id="inv_clients_id" v-model="formState.clients_id" placeholder="Client Ref No." readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input name="inv_client_name" id="inv_client_name" class="form-control form-control-sm" placeholder="Select Client" autocomplete="off" readonly>
-
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="number" class="form-control form-control-sm" id="amount" v-model="formState.amount" placeholder="Amount" >
-                                    <span v-if="formState.errors.amount" class="text-sm text-danger ps-2">{{ formState.errors.amount }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="date" class="form-control form-control-sm" id="due_date" v-model="formState.due_date" placeholder="Due Date">
-                                    <span v-if="formState.errors.due_date" class="text-sm text-danger ps-2">{{ formState.errors.due_date }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="number" class="form-control form-control-sm" id="rcd_amount" v-model="formState.rcd_amount" placeholder="Received Amount" >
-                                    <span v-if="formState.errors.rcd_amount" class="text-sm text-danger ps-2">{{ formState.errors.rcd_amount }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="date" class="form-control form-control-sm" id="rcd_due_date" v-model="formState.rcd_due_date" placeholder="Received Date">
-                                    <span v-if="formState.errors.rcd_due_date" class="text-sm text-danger ps-2">{{ formState.errors.rcd_due_date }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <select class="form-control form-control-sm" v-model="formState.status" >
-                                        <option disabled >Select client status</option>
-                                        <option value="bad_debts">Bad debt</option>
-                                        <option value="good" selected>Good debt</option>
-                                    </select>
-                                    <span v-if="formState.errors.status" class="text-sm text-danger ps-2">{{ formState.errors.status }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <select class="form-control form-control-sm" v-model="formState.payment_type" >
-                                        <option disabled>Select payment type</option>
-                                        <option value="bank" selected>Bank</option>
-                                        <option value="cash">Cash</option>
-                                    </select>
-                                    <span v-if="formState.errors.payment_type" class="text-sm text-danger ps-2">{{ formState.errors.payment_type }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="number" class="form-control form-control-sm" id="bad_debt_amount" v-model="formState.bad_debt_amount" placeholder="Bad Debt. Amount" >
-                                    <span v-if="formState.errors.bad_debt_amount" class="text-sm text-danger ps-2">{{ formState.errors.bad_debt_amount }}</span>
-                                </div>
-                            </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <textarea class="form-control form-control-sm" v-model="formState.notes" id="notes"></textarea>
-                                    <span v-if="formState.errors.notes" class="text-sm text-danger ps-2">{{ formState.errors.notes }}</span>
+                                    <input type="hidden" class="form-control" id="invoice_id" v-model="formState.id">
+                                    <p class="invoice_alert">{{ invoice_alert }}</p>
                                 </div>
                             </div>
 
                         </div>
                         <div>
-                            <button type="button" class="btn bg-gradient-secondary" @click="addInvoiceModelClose">Close</button>
-                            <button type="submit" id="submitInvoiceBtn" class="btn bg-gradient-success">Add</button>
+                            <button type="button" class="btn bg-gradient-danger" @click="closeDeleteInvoiceModel" data-bs-dismiss="modal">No</button>
+                            <button type="submit" id="deleteInvoiceBtn" @click="deleteInvoice" class="btn bg-gradient-success">Yes</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>-->
-
-    <!--    End Modal for Add invoice-->
+    </div>
+<!-- End Modal for Delete invoice -->
 
 <!--    Modal for Import Invoice-->
 <!--    <div class="modal fade" id="importInvoiceModel" tabindex="-1" role="dialog" aria-labelledby="importInvoiceModelLabel">
@@ -378,9 +273,13 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
 import InvoiceAddModal from "@/components/pages/invoices/partials/InvoiceAddModal.vue";
+import FetchInvoices from "@/components/pages/invoices/partials/FetchInvoices.vue";
 import axios from "@/axios.js";
 
+// variables for modal
 const addInvoiceModel = ref(false);
+const deleteInvoiceModel = ref(false);
+
 const formState = reactive({
     id: '',
     invoice_year: '',
@@ -398,6 +297,8 @@ const formState = reactive({
 
 const clients = ref([]);
 const invoices = ref([]);
+
+
 const pagination = ref({
     current_page: 1,
     last_page: 1,
@@ -430,19 +331,6 @@ onMounted(() => {
     fetchInvoices();
 })
 
-/*const inv_clients_ref = (e) => {
-    const selectedRefNo = e.target.value;
-    const selectedClient = clients.value.find(client => client.ref_no === selectedRefNo);
-
-    if (selectedClient) {
-        formState.clients_id = selectedClient.id; // Set the selected client's ID
-        document.getElementById('inv_client_name').value = selectedClient.name; // Update the client name input
-    } else {
-        formState.clients_id = ''; // Reset if no valid client is selected
-        document.getElementById('inv_client_name').value = '';
-    }
-}*/
-
 const fetchInvoices = async (page) => {
     await axios.get(`/api/invoices?page=${page}`)
         .then(response=>{
@@ -459,6 +347,8 @@ const fetchInvoices = async (page) => {
 
         })
 }
+
+// Add Invoice module
 const fetchClients = async () => {
     await axios.get(`/api/invoices/fetchClients`)
         .then(response=>{
@@ -475,45 +365,49 @@ const addInvoiceModelOpen = () => {
 const addInvoiceModelClose = () => {
     addInvoiceModel.value = false
 };
+// End Add Invoice module
 
-/*const AddInvoiceForm = async () => {
-    await axios.post('/api/invoices', {
-        invoice_year: formState.invoice_year,
-        clients_id: formState.clients_id,
-        amount: formState.amount,
-        due_date: formState.due_date,
-        rcd_amount: formState.rcd_amount,
-        rcd_due_date: formState.rcd_due_date,
-        status: formState.status,
-        payment_type: formState.payment_type,
-        bad_debt_amount: formState.bad_debt_amount,
-        notes: formState.notes,
-    }).then(response=>{
-        console.log(response.data.message);
-        addInvoiceModelClose();
-        formState.invoice_year.value= '',
-        formState.clients_id.value= '',
-        formState.amount.value= '',
-        formState.due_date.value= '',
-        formState.rcd_amount.value= '',
-        formState.rcd_due_date.value= '',
-        formState.status.value= '',
-        formState.payment_type.value= '',
-        formState.bad_debt_amount.value= '',
-        formState.notes.value= '-'
-    }).catch(error=>{
-        if (error.response.status == 422) {
-            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
-                acc[field] = error.response.data.errors[field][0]; // Get the first error message
-                return acc;
-            }, {});
-        } else {
-            formState.errors = {
-                general: 'An unexpected error occurred. Please try again later.'
-            };
-        }
+// Update Invoice module
+const editInvoice = (id) => {
+
+}
+// End Update Invoice module
+
+// Delete Invoice module
+const invoice_alert = ref('');
+const deleteInvoiceModelOpen = (id) => {
+    formState.id = id
+    axios.get(`/api/invoices/${id}`)
+        .then(response=>{
+            console.log(response.data);
+            deleteInvoiceModel.value = true
+            invoice_alert.value = `Do you really want to delete Invoice # ${response.data.invoice.id} ?`
+        }).catch(error=>{
+
     })
-};*/
+
+}
+
+const deleteInvoice = () => {
+    axios.delete(`/api/invoices/${formState.id}`)
+        .then(response=>{
+            if(response.status === 201) {
+                fetchInvoices();
+                closeDeleteInvoiceModel();
+            }
+        }).catch(error=>{
+
+        })
+}
+
+const closeDeleteInvoiceModel = () => {
+    invoice_alert.value = '';
+    deleteInvoiceModel.value = false
+}
+
+// End Delete Invoice module
+
+
 </script>
 
 <style scoped>

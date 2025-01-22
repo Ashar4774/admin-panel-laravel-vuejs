@@ -67,9 +67,21 @@ class InvoiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        try{
+            $invoice = Invoice::findOrFail($id);
+            return response()->json([
+               'message' => 'Invoice found',
+               'invoice' => $invoice
+            ], 201);
+        } catch(\Exception $e){
+            return response()->json([
+                'message' => 'There is something wrong while fetching Invoice result. Please try again.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
     }
 
     /**
@@ -91,8 +103,18 @@ class InvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        try {
+            $invoice = Invoice::findOrFail($id);
+            $invoice->delete();
+            return response()->json([
+                'message' => 'Invoice has been deleted'
+            ], 201);
+        } catch(\Exception $e){
+            return response()->json([
+                'error' => 'There is an error while deleting Invoice, please try again'
+            ], 500);
+        }
     }
 }

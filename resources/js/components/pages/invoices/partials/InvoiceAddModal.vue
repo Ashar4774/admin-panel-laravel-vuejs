@@ -23,7 +23,7 @@
                                     <!--                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">-->
                                     <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref">
                                         <option value="" disabled selected>Select client</option>
-                                        <option v-for="client in clients"
+                                        <option v-for="client in fetchClients"
                                                 :value="client.ref_no"
                                                 :data-ref="client.name"
                                                 :data-id="client.id">{{ client.ref_no }}</option>
@@ -112,13 +112,16 @@
 import axios from "@/axios.js";
 import {ref} from "vue";
 
-const prop = defineProps(['addInvoiceModel', 'formState'])
-const emit = defineEmits(['close', 'fetchInvoices', 'fetchClients'])
+const prop = defineProps(['addInvoiceModel', 'formState', 'clients'])
+const emit = defineEmits(['close', 'fetchInvoices'])
 
-const clients = ref([]);
+const fetchClients = prop.clients;
+console.log("fetchClients in Add child component: ")
+console.log(prop.clients)
+
 const inv_clients_ref = (e) => {
     const selectedRefNo = e.target.value;
-    const selectedClient = clients.value.find(client => client.ref_no === selectedRefNo);
+    const selectedClient = fetchClients.find(fetchClient => fetchClient.ref_no === selectedRefNo);
 
     if (selectedClient) {
         prop.formState.clients_id = selectedClient.id; // Set the selected client's ID
@@ -133,11 +136,6 @@ const addInvoiceModelClose = () => {
     emit('close')
 }
 
-const fetchClients = () => {
-    emit('fetchClients');
-    // console.log("clients function in child component:");
-    // console.log(emit('fetchClients'));
-}
 
 const fetchInvoices = () => {
     emit('fetchInvoices');
