@@ -203,34 +203,7 @@
 <!--    End Modal for Add invoice-->
 
 <!-- Modal for Delete invoice -->
-    <div v-if="deleteInvoiceModel" class="modal" id="deleteInvoiceModel">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteInvoiceModelLabel">Delete Invoice</h5>
-                    <button type="button" class="btn-close bg-dark" @click="closeDeleteInvoiceModel">
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" id="deleteInvoiceForm">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <input type="hidden" class="form-control" id="invoice_id" v-model="formState.id">
-                                    <p class="invoice_alert">{{ invoice_alert }}</p>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div>
-                            <button type="button" class="btn bg-gradient-danger" @click="closeDeleteInvoiceModel" data-bs-dismiss="modal">No</button>
-                            <button type="submit" id="deleteInvoiceBtn" @click="deleteInvoice" class="btn bg-gradient-success">Yes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <InvoiceDeleteModal :deleteInvoiceModel="deleteInvoiceModel" :formState="formState" :invoice_alert="invoice_alert" @fetchInvoices="fetchInvoices" @closeDeleteInvoiceModel="closeDeleteInvoiceModel" />
 <!-- End Modal for Delete invoice -->
 
 <!--    Modal for Import Invoice-->
@@ -273,6 +246,7 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
 import InvoiceAddModal from "@/components/pages/invoices/partials/InvoiceAddModal.vue";
+import InvoiceDeleteModal from "@/components/pages/invoices/partials/InvoiceDeleteModal.vue";
 import FetchInvoices from "@/components/pages/invoices/partials/FetchInvoices.vue";
 import axios from "@/axios.js";
 
