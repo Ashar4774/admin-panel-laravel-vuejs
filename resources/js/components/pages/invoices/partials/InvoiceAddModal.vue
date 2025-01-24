@@ -116,8 +116,6 @@ const prop = defineProps(['addInvoiceModel', 'formState', 'clients'])
 const emit = defineEmits(['close', 'fetchInvoices'])
 
 const fetchClients = prop.clients;
-console.log("fetchClients in Add child component: ")
-console.log(prop.clients)
 
 const inv_clients_ref = (e) => {
     const selectedRefNo = e.target.value;
@@ -155,7 +153,6 @@ const AddInvoiceForm = async () => {
         bad_debt_amount: prop.formState.bad_debt_amount,
         notes: prop.formState.notes,
     }).then(response=>{
-        console.log(response.data.message);
         fetchInvoices();
         addInvoiceModelClose();
             prop.formState.invoice_year.value= '',

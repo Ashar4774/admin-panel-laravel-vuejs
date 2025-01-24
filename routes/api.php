@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('clients', ClientController::class);
 
     Route::get('invoices/fetchClients', [InvoiceController::class, 'fetchClients'])->name('fetchClients');
+    Route::post('invoices/import', [InvoiceController::class, 'import']);
     Route::apiResource('invoices', InvoiceController::class);
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

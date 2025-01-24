@@ -21,7 +21,7 @@
             <a v-if="invoice.rcd_amount == null && invoice.bad_debt_amount == null" href="#" class="" id="payInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Pay Invoice">
                 <i class="fa-solid fa-file-invoice text-white-50"></i>
             </a>
-            <a href="#" class="mx-2" id="editInvoice" @click="editInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Edit Invoice">
+            <a href="#" class="mx-2" id="editInvoice" @click="updateInvoiceModelOpen(invoice.id)" :data-id="invoice.id" data-bs-toggle="tooltip" title="Edit Invoice">
                 <i class="fas fa-user-edit text-white-50"></i>
             </a>
             <span>
@@ -33,7 +33,7 @@
 
 <script setup>
 
-const prop = defineProps(['invoices', 'editInvoice', 'deleteInvoiceModelOpen']);
+const prop = defineProps(['invoices', 'editInvoice', 'updateInvoiceModelOpen', 'deleteInvoiceModelOpen']);
 
 </script>
 

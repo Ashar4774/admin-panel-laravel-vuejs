@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\v1\Invoice\InvoiceImportRequest;
 use App\Http\Requests\API\v1\Invoice\InvoiceRequest;
+use App\Imports\InvoiceDetailImport;
 use App\Models\Client;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
@@ -23,6 +26,21 @@ class InvoiceController extends Controller
     {
         $clients = Client::get();
         return response()->json($clients);
+    }
+
+    public function import(InvoiceImportRequest $request){
+        try {
+            Excel::import(new InvoiceDetailImport, $request->file('invoice_file'));
+
+            return response()->json([
+                'message' => 'Invoice records has been imported successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is something wrong while importing invoice file, please try again.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
