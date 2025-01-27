@@ -203,7 +203,7 @@
 <!--    End Modal for Add invoice-->
 
 <!--    Modal for Update invoice-->
-    <InvoiceUpdateModal :updateInvoiceModel="updateInvoiceModel" :formState="formState" :clients="clients" @fetchInvoices="fetchInvoices" @updateInvoiceModelClose="updateInvoiceModelClose" />
+    <InvoiceUpdateModal :updateInvoiceModel="updateInvoiceModel" :formState="formState" :clients="clients" :selectedInvoiceId="selectedInvoiceId" @fetchInvoices="fetchInvoices" @updateInvoiceModelClose="updateInvoiceModelClose" />
 <!--    <div v-if="updateInvoiceModel" class="modal" id="addInvoiceModel">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -354,6 +354,7 @@ const formState = reactive({
 
 const clients = ref([]);
 const invoices = ref([]);
+const selectedInvoiceId = ref('');
 
 
 const pagination = ref({
@@ -391,15 +392,12 @@ onMounted(() => {
 const fetchInvoices = async (page) => {
     await axios.get(`/api/invoices?page=${page}`)
         .then(response=>{
-            console.log(response.data);
             invoices.value = response.data.data;
             pagination.value = reactive({
                 current_page: response.data.current_page,
                 last_page: response.data.last_page,
                 total: response.data.total
             });
-
-            console.log(response.data)
         }).catch(error=>{
 
         })
@@ -430,19 +428,21 @@ const updateInvoiceModelOpen = (id) => {
     axios.get(`/api/invoices/${id}`)
         .then(response=>{
             if(response.status === 201 && response.data.invoice){
-                    formState.id = response.data.invoice.id,
-                    formState.invoice_year = response.data.invoice.invoice_year,
-                    formState.clients_id = response.data.invoice.clients_id,
-                    formState.amount = response.data.invoice.amount,
-                    formState.due_date = response.data.invoice.due_date,
-                    formState.rcd_amount = response.data.invoice.rcd_amount,
-                    formState.rcd_due_date = response.data.invoice.rcd_due_date,
-                    formState.status = response.data.invoice.status,
-                    formState.payment_type = response.data.invoice.payment_type,
-                    formState.bad_debt_amount = response.data.invoice.bad_debt_amount,
-                    formState.notes =  response.data.invoice.notes
+
+                formState.id = response.data.invoice.id,
+                formState.invoice_year = response.data.invoice.invoice_year,
+                formState.clients_id = response.data.invoice.clients_id,
+                formState.amount = response.data.invoice.amount,
+                formState.due_date = response.data.invoice.due_date,
+                formState.rcd_amount = response.data.invoice.rcd_amount,
+                formState.rcd_due_date = response.data.invoice.rcd_due_date,
+                formState.status = response.data.invoice.status,
+                formState.payment_type = response.data.invoice.payment_type,
+                formState.bad_debt_amount = response.data.invoice.bad_debt_amount,
+                formState.notes =  response.data.invoice.notes
 
                 updateInvoiceModel.value = true
+                selectedInvoiceId.value = id;
             } else {
                 console.error('Invoice data not found or invalid status:', response.data);
             }
@@ -452,7 +452,7 @@ const updateInvoiceModelOpen = (id) => {
     })
 };
 
-const updateInvoiceForm = () => {
+/*const updateInvoiceForm = () => {
     axios.put(`/api/invoices/${formState.id}`,{
         invoice_year : formState.invoice_year,
         clients_id : formState.clients_id,
@@ -479,7 +479,7 @@ const updateInvoiceForm = () => {
             };
         }
     })
-}
+}*/
 
 const updateInvoiceModelClose = () => {
     updateInvoiceModel.value = false
