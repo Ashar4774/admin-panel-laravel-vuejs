@@ -48,6 +48,31 @@ class ClientController extends Controller
 
     }
 
+    public function state_of_account($id)
+    {
+        try {
+            $client = Client::with('invoices')->where('id', $id)->first();
+            if ($client) {
+                $client->arrears = $client->calculateArrears();
+                $client->bad_debt = $client->calculateBadDebts();
+
+                return response()->json([
+                    'client' => $client
+                ]);
+            }
+
+//            flash()->success('Client details are found.');
+
+        } catch(Exception $e){
+            flash()->error('Client details are not found.');
+
+            return response()->json([
+                'message' => 'Client details are not found.',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      */
