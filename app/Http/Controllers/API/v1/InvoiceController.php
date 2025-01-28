@@ -113,9 +113,33 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(InvoiceRequest $request, $id)
     {
-        //
+        try {
+            $invoice = Invoice::findOrFail($id);
+            $invoice->update([
+                'clients_id' => $request['clients_id'],
+                'amount' => $request['amount'],
+                'due_date' => $request['due_date'],
+                'rcd_amount' => $request['rcd_amount'],
+                'rcd_due_date' => $request['rcd_due_date'],
+                'invoice_year' => $request['invoice_year'],
+                'notes' => $request['notes'],
+                'status' => $request['status'],
+                'payment_type' => $request['payment_type'],
+            ]);
+
+            return response()->json([
+                'message' => 'Invoice updated successfully',
+                'invoice' => $invoice
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is an error while updating invoice. Please try again.',
+                'error' => $e->getMessage()
+            ]);
+        }
+
     }
 
     /**

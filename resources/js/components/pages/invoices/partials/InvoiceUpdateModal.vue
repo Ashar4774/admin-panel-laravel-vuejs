@@ -21,12 +21,11 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <!--                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">-->
-                                    <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref">
+                                    <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref"  v-model="selectedRefNo">
                                         <option value="" disabled selected>Select client</option>
                                         <option v-for="client in clients"
                                                 :value="client.ref_no"
-                                                :data-ref="client.name"
-                                                :data-id="client.id" :class="(prop.formState.clients_id == client.id) ? 'selected' : ''">{{ client.ref_no }}</option>
+                                                >{{ client.ref_no }}</option>
                                     </select>
                                     <span v-if="prop.formState.errors.clients_id" class="text-sm text-danger ps-2">{{ prop.formState.errors.clients_id }}</span>
                                     <input type="number" class="form-control form-control-sm d-none" id="inv_clients_id" v-model="prop.formState.clients_id" placeholder="Client Ref No." readonly>
@@ -34,7 +33,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <input name="inv_client_name" id="inv_client_name" class="form-control form-control-sm inv_client_name" placeholder="Select Client" autocomplete="off" readonly>
+                                    <input id="inv_client_name" :value="selectedClientName" class="form-control form-control-sm inv_client_name" placeholder="Select Client" autocomplete="off" readonly>
 
                                 </div>
                             </div>
@@ -109,12 +108,15 @@
 
 <script setup>
 
-import {onMounted, watch} from "vue";
+import {onMounted, watch, ref} from "vue";
 
 const prop = defineProps(['updateInvoiceModel', 'formState', 'clients', 'selectedInvoiceId']);
 const emit = defineEmits(['fetchInvoices', 'updateInvoiceModelClose']);
 
 const fetchClients = prop.clients;
+
+const selectedRefNo = ref('');
+const selectedClientName = ref('');
 
 watch(() => prop.selectedInvoiceId,()=>{
     selected_clients_detail();
@@ -122,44 +124,26 @@ watch(() => prop.selectedInvoiceId,()=>{
 const selected_clients_detail = () => {
     const selectedClientId = prop.formState.clients_id;
     const selectedClientDetail = prop.clients.find(fetchClient => {
-        console.log("Checking fetchClient:", fetchClient); // Log each client object
-        console.log("fetchClient.id:", fetchClient.id, "selectedClientId:", selectedClientId); // Compare IDs
-
-        // Check for type mismatch
-        if (typeof fetchClient.id !== typeof selectedClientId) {
-            console.warn("Type mismatch:", typeof fetchClient.id, typeof selectedClientId);
-        }
-
         return fetchClient.id === selectedClientId; // The condition to find the correct client
     });
 
-    if (!selectedClientDetail) {
-        console.error("No client found with ID:", selectedClientId);
-    }
-    console.log("selectedClientId")
-    console.log(selectedClientId)
-
-    console.log("selectedClient")
-    console.log(selectedClientDetail)
     if (selectedClientDetail) {
-        // prop.formState.clients_id = selectedClient.id; // Set the selected client's ID
-        document.getElementById('clientList').value = selectedClientDetail.ref_no;
-
-        // Set the client name input field
-        document.getElementsByClassName('inv_client_name')[0].value = selectedClientDetail.name;
+        selectedRefNo.value = selectedClientDetail.ref_no;
+        selectedClientName.value = selectedClientDetail.name;
     }
 }
 
 const inv_clients_ref = (e) => {
     const selectedRefNo = e.target.value;
-    const selectedClient = fetchClients.find(fetchClient => fetchClient.ref_no === selectedRefNo);
-
+    const selectedClient = fetchClients.find(fetchClient => {
+        return fetchClient.ref_no === selectedRefNo; // The condition to find the correct client
+    });
     if (selectedClient) {
         prop.formState.clients_id = selectedClient.id; // Set the selected client's ID
-        document.getElementById('inv_client_name').value = selectedClient.name; // Update the client name input
+        selectedClientName.value = selectedClient.name; // Update the client name input
     } else {
         prop.formState.clients_id = ''; // Reset if no valid client is selected
-        document.getElementById('inv_client_name').value = '';
+        selectedClientName.value = '';
     }
 }
 

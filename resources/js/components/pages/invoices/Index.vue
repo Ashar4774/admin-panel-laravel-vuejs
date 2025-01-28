@@ -452,35 +452,6 @@ const updateInvoiceModelOpen = (id) => {
     })
 };
 
-/*const updateInvoiceForm = () => {
-    axios.put(`/api/invoices/${formState.id}`,{
-        invoice_year : formState.invoice_year,
-        clients_id : formState.clients_id,
-        amount : formState.amount,
-        due_date : formState.due_date,
-        rcd_amount : formState.rcd_amount,
-        rcd_due_date : formState.rcd_due_date,
-        status : formState.status,
-        payment_type : formState.payment_type,
-        bad_debt_amount : formState.bad_debt_amount,
-        notes : formState.notes
-    }).then(response=>{
-        fetchInvoices();
-        updateInvoiceModelClose();
-    }).catch(error=>{
-        if (error.response.status == 422) {
-            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
-                acc[field] = error.response.data.errors[field][0]; // Get the first error message
-                return acc;
-            }, {});
-        } else {
-            formState.errors = {
-                general: 'An unexpected error occurred. Please try again later.'
-            };
-        }
-    })
-}*/
-
 const updateInvoiceModelClose = () => {
     updateInvoiceModel.value = false
 };
