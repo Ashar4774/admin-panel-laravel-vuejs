@@ -2,8 +2,8 @@
     <tr v-if="clients" v-for="client in clients" :key="client.id">
         <td class="ps-4">{{ client.ref_no }}</td>
         <td>{{ client.name }}</td>
-        <td>0</td>
-        <td>0</td>
+        <td>{{ client.arrears ?? 0  }}</td>
+        <td>{{ client.bad_debts ?? 0 }}</td>
         <td class="text-center">
             <a href="#" class="mx-3" data-bs-toggle="tooltip" title="View User">
                 <i class="fa-solid fa-eye text-secondary"></i>

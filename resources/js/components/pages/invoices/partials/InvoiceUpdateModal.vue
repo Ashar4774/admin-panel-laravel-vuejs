@@ -108,7 +108,7 @@
 
 <script setup>
 
-import {onMounted, watch, ref} from "vue";
+import {watch, ref} from "vue";
 
 const prop = defineProps(['updateInvoiceModel', 'formState', 'clients', 'selectedInvoiceId']);
 const emit = defineEmits(['fetchInvoices', 'updateInvoiceModelClose']);

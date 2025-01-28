@@ -4,6 +4,7 @@ import state from "@/state/index.js";
 import Login from '../components/Login.vue';
 import PanelLayout from '../components/PanelLayout.vue';
 import Dashboard from '../components/pages/Dashboard.vue';
+import StateOfAccount from '../components/pages/StateOfAccount.vue';
 import ClientIndex from '../components/pages/clients/Index.vue';
 import InvoiceIndex from '../components/pages/invoices/Index.vue';
 
@@ -38,6 +39,15 @@ const routes = [
         path: '/invoice',
         name: 'invoice',
         component: InvoiceIndex,
+        meta: {
+            layout: 'PanelLayout',
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/state_of_account',
+        name: 'state_of_account',
+        component: StateOfAccount,
         meta: {
             layout: 'PanelLayout',
             requiresAuth: true

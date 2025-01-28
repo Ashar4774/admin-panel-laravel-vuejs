@@ -18,7 +18,16 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $clients = Client::orderBy('updated_at', 'desc')->paginate(10);
+        $clients = Client::with('invoices')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+
+        // Map over the items in the paginated collection
+        $clients->getCollection()->transform(function ($client) {
+            $client->arrears = $client->calculateArrears();
+            $client->bad_debts = $client->calculateBadDebts();
+            return $client;
+        });
         return response()->json($clients);
     }
 
