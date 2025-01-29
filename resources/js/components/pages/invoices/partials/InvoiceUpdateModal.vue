@@ -20,7 +20,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <!--                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">-->
+
                                     <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref"  v-model="selectedRefNo">
                                         <option value="" disabled selected>Select client</option>
                                         <option v-for="client in clients"
