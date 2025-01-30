@@ -6,6 +6,7 @@ import PanelLayout from '../components/PanelLayout.vue';
 import Dashboard from '../components/pages/Dashboard.vue';
 import StateOfAccount from '../components/pages/StateOfAccount.vue';
 import ClientIndex from '../components/pages/clients/Index.vue';
+import ClientStateOfAccount from '../components/pages/clients/StateOfAccount.vue';
 import InvoiceIndex from '../components/pages/invoices/Index.vue';
 
 const routes = [
@@ -30,6 +31,15 @@ const routes = [
         path: '/client',
         name: 'client',
         component: ClientIndex,
+        meta: {
+            layout: 'PanelLayout',
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/client/state_of_account',
+        name: 'client.state_of_account',
+        component: ClientStateOfAccount,
         meta: {
             layout: 'PanelLayout',
             requiresAuth: true
