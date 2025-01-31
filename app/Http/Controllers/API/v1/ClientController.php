@@ -110,11 +110,20 @@ class ClientController extends Controller
     public function show($id)
     {
         try {
-            $client = Client::findOrFail($id);
-            return response()->json([
-                'message' => 'Client found',
-                'client' => $client
-            ], 201);
+            $client = Client::with('invoices')->findOrFail($id);
+            if ($client) {
+                $client->arrears = $client->calculateArrears();
+                $client->bad_debt = $client->calculateBadDebts();
+
+                return response()->json([
+                    'message' => 'Client found',
+                    'client' => $client
+                ], 201);
+            } else {
+                return response()->json([
+                    'message' => 'Client not found'
+                ], 404);
+            }
         } catch(\Exception $e){
             return response()->json([
                 'message' => 'There is an error while fetching client details. Please try again.',

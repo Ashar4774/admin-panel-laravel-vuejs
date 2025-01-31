@@ -37,12 +37,13 @@ const routes = [
         }
     },
     {
-        path: '/client/state_of_account',
+        path: '/client/state_of_account/:id',
         name: 'client.state_of_account',
         component: ClientStateOfAccount,
+        props: true,
         meta: {
             layout: 'PanelLayout',
-            requiresAuth: true
+            requiresAuth: true,
         }
     },
     {
@@ -68,7 +69,7 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
-    linkExactActiveClass: 'active'
+    linkActiveClass: 'active'
 });
 
 router.beforeEach((to, from, next)=>{

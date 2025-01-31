@@ -8,9 +8,9 @@
             <a href="#" class="mx-3" data-bs-toggle="tooltip" title="View User">
                 <i class="fa-solid fa-eye text-secondary"></i>
             </a>
-            <a href="#" class="" data-bs-toggle="tooltip" title="State of Account">
+            <router-link :to="{ name: 'client.state_of_account', params:{id: client.id} }" class="" data-bs-toggle="tooltip" title="State of Account">
                 <i class="fa-solid fa-file-invoice text-secondary"></i>
-            </a>
+            </router-link>
             <a href="#" class="mx-3" @click="editClient(client.id)" data-bs-toggle="tooltip" title="Edit User" data-id="{{ client.id  }}">
                 <i class="fas fa-user-edit text-secondary"></i>
             </a>
