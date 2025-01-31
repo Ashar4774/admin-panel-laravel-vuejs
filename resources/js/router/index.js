@@ -8,6 +8,7 @@ import StateOfAccount from '../components/pages/StateOfAccount.vue';
 import ClientIndex from '../components/pages/clients/Index.vue';
 import ClientStateOfAccount from '../components/pages/clients/StateOfAccount.vue';
 import InvoiceIndex from '../components/pages/invoices/Index.vue';
+import UserProfile from '../components/pages/UserProfile.vue';
 
 const routes = [
     {
@@ -59,6 +60,15 @@ const routes = [
         path: '/state_of_account',
         name: 'state_of_account',
         component: StateOfAccount,
+        meta: {
+            layout: 'PanelLayout',
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/user_profile',
+        name: 'user_profile',
+        component: UserProfile,
         meta: {
             layout: 'PanelLayout',
             requiresAuth: true

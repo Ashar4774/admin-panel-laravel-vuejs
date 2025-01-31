@@ -68,12 +68,12 @@
             </router-link>
         </li>
         <li class="nav-item">
-            <a class="nav-link " href="#">
+            <router-link class="nav-link " :to="{ name: 'user_profile' }">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <img src="/assets/img/icons/setting.png" width="12px" height="12px" alt="user-profile-img">
                 </div>
                 <span class="nav-link-text ms-1">User Profile</span>
-            </a>
+            </router-link>
         </li>
     </ul>
 </div>
