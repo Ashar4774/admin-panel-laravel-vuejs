@@ -22,4 +22,11 @@ class Client extends Model
     public function calculateBadDebts(){
         return $this->invoices->where('status', 'bad_debts')->sum('bad_debt_amount');
     }
+
+    public function calculateAmounts(){
+        return $this->invoices->sum('amount');
+    }
+    public function calculatePayments(){
+        return $this->invoices->sum('rcd_amount');
+    }
 }

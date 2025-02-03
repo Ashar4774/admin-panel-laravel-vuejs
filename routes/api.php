@@ -16,7 +16,7 @@ use App\Http\Controllers\API\v1\DashboardController;
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 //Route::apiResource('clients', ClientController::class);
 Route::middleware('auth:sanctum')->group(function(){
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard/getInfo', [DashboardController::class, 'index']);
     Route::get('checkAuthStatus', [AuthController::class, 'checkAuthStatus'])->name('checkAuthStatus');
 //    Route::post('clients/store', [ClientController::class, 'store']);
     Route::post('clients/import', [ClientController::class, 'import']);
@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('invoices', InvoiceController::class);
 
     Route::get('/state_of_account/show/{ref_no}', [StateOfAccountController::class, 'show']);
+    Route::get('/user_profile', [DashboardController::class, 'user_profile']);
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

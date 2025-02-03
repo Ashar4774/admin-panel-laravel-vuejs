@@ -98,11 +98,9 @@ import axios from "@/axios.js";
 
 const totals = ref([]);
 const fetchData = async () => {
-    await axios.get('/api/dashboard')
+    await axios.get('/api/dashboard/getInfo')
         .then(response => {
-            console.log(response.data)
             totals.value = response.data
-            console.log(totals)
         }).catch(error=>{
             console.error(error);
         })
