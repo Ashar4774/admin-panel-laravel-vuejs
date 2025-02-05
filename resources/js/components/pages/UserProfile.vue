@@ -8,9 +8,9 @@
                 <div class="row gx-4">
                     <div class="col-auto">
                         <div class="avatar avatar-xl position-relative">
-                            <img src="" alt="profile-pic" class="w-100 border-radius-lg shadow-sm">
-<!--                            <img src="{{ auth()->user()->image ? asset(auth()->user()->image) : asset('./assets/img/bruce-mars.jpg') }}" alt="{{ auth()->user()->name .'-profile-pic' }}" class="w-100 border-radius-lg shadow-sm">-->
-                            <a href="javascript:;" class="btn btn-sm btn-icon-only bg-gradient-light position-absolute bottom-0 end-0 mb-n2 me-n2" id="edit-image-button">
+<!--                            <img src="" alt="profile-pic" class="w-100 border-radius-lg shadow-sm">-->
+                            <img :src="authImage" :alt="formState.name + '-profile-pic'" class="w-100 border-radius-lg shadow-sm">
+                            <a href="javascript:;" class="btn btn-sm btn-icon-only bg-gradient-light position-absolute bottom-0 end-0 mb-n2 me-n2" @click="edit_image_button" id="edit-image-button">
                                 <i class="fa fa-pen top-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Image"></i>
                             </a>
                         </div>
@@ -60,7 +60,7 @@
                     <h6 class="mb-0">Profile Information</h6>
                 </div>
                 <div class="card-body pt-4 p-3">
-                    <form action="/user-profile" method="POST" role="form text-left" enctype="multipart/form-data">
+                    <form action="/user-profile" method="POST" role="form text-left" enctype="multipart/form-data" @submit.prevent="updateProfile">
 
 <!--                        @if($errors->any())
                         <div class="mt-3  alert alert-primary alert-dismissible fade show" role="alert">
@@ -83,7 +83,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <input type="file" id="profile-image-input" name="image" class="d-none" accept="image/*">
+                                    <input type="file" id="profile-image-input" @change="handleFileChange" class="d-none" accept="image/*">
                                     <label for="user-name" class="form-control-label">Full Name</label>
                                     <div class="">
                                         <input class="form-control" v-model="formState.name" type="text" placeholder="Name" id="user-name">
@@ -148,7 +148,7 @@
                     <h6 class="mb-0">Change Password</h6>
                 </div>
                 <div class="card-body pt-4 p-3">
-                    <form action="/change-password" method="POST" role="form text-left">
+                    <form action="/change-password" method="POST" role="form text-left" @submit.prevent="updatePassword">
 
 <!--                        @if($errors->any())
                         <div class="mt-3  alert alert-primary alert-dismissible fade show" role="alert">
@@ -174,7 +174,7 @@
                                     <label for="current-password" class="form-control-label">Current Password</label>
 <!--                                    <div class="@error('user.name')border border-danger rounded-3 @enderror">-->
                                     <div class="">
-                                        <input class="form-control" type="password" id="current-password" name="current_password">
+                                        <input class="form-control" type="password" id="current-password" v-model="formState.password">
 
                                     </div>
                                 </div>
@@ -183,7 +183,7 @@
                                 <div class="form-group">
                                     <label for="new-password" class="form-control-label">New Password</label>
                                     <div class="">
-                                        <input class="form-control" type="password" id="new-password" name="new_password">
+                                        <input class="form-control" type="password" id="new-password" v-model="formState.new_password">
 <!--                                        @error('new_password')
                                         <p class="text-danger text-xs mt-2">{{ $message }}</p>
                                         @enderror-->
@@ -194,7 +194,7 @@
                                 <div class="form-group">
                                     <label for="new-password" class="form-control-label">Confirm Password</label>
                                     <div class="">
-                                        <input class="form-control" type="password" id="new-password-confirmation" name="new_password_confirmation">
+                                        <input class="form-control" type="password" id="new-password-confirmation" v-model="formState.new_password_confirmation">
 <!--                                        @error('new_password_confirmation')
                                         <p class="text-danger text-xs mt-2">{{ $message }}</p>
                                         @enderror-->
@@ -214,7 +214,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref, reactive} from 'vue';
+import {onMounted, ref, reactive, computed} from 'vue';
 
 const auth = ref([]);
 const formState = reactive({
@@ -223,8 +223,11 @@ const formState = reactive({
    email  : '',
    password  : '',
     phone  : '',
+    new_password  : '',
+    new_password_confirmation  : '',
    location  : '',
    about_me  : '',
+    errors : {}
 })
 
 const fetchAuth = async () => {
@@ -243,9 +246,58 @@ const fetchAuth = async () => {
         })
 }
 
+const authImage = computed(() => {
+    return formState.image ? asset(formState.image) : asset('./assets/img/bruce-mars.jpg');
+});
+
+const asset = (path) => {
+    return `${window.location.origin}/${path}`;
+};
+
 onMounted(()=>{
     fetchAuth();
 })
+
+const updateProfile = async () => {
+    await axios.post('/api/update_profile', {
+        image: formState.image,
+        name: formState.name,
+        email: formState.email,
+        phone: formState.phone,
+        location: formState.location,
+        about_me: formState.about_me,
+    }).then(response=>{
+        console.log(response.data);
+    }).catch(error=>{
+        console.error(error);
+        if (error.response.status == 422) {
+            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                return acc;
+            }, {});
+        } else {
+            formState.errors = {
+                general: 'An unexpected error occurred. Please try again later.'
+            };
+        }
+    })
+}
+
+const updatePassword = () => {
+    //
+}
+
+const edit_image_button = () => {
+    document.getElementById('profile-image-input').click();
+}
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    if (file) {
+        formState.image = file; // Update the form state
+        authImage.value = URL.createObjectURL(file); // Generate a preview URL
+    }
+}
 
 </script>
 
