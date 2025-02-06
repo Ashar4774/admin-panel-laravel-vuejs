@@ -24,12 +24,12 @@ class UserProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['nullable', 'max:4048', 'image', 'mimes:jpeg,png,jpg,gif,webp'],
+//            'image' => ['nullable', 'max:4048', 'image', 'mimes:jpeg,png,jpg,gif,webp'],
             'name' => ['required', 'max:50'],
             'email' => ['required', 'email', 'max:50', Rule::unique('users')->ignore(Auth::user()->id)],
-            'phone'     => ['max:50'],
-            'location' => ['max:70'],
-            'about_me'    => ['max:150'],
+            'phone'     => ['nullable','max:50'],
+            'location' => ['nullable','max:70'],
+            'about_me'    => ['nullable','max:150'],
         ];
     }
 }

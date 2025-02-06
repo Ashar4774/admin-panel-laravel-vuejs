@@ -7,7 +7,7 @@
             <div class="card card-body shadow-blur mx-4 mt-n6">
                 <div class="row gx-4">
                     <div class="col-auto">
-                        <div class="avatar avatar-xl position-relative">
+                        <div :class="['avatar avatar-xl position-relative',formState.errors.image ? 'border border-danger' : '']">
 <!--                            <img src="" alt="profile-pic" class="w-100 border-radius-lg shadow-sm">-->
                             <img :src="authImage" :alt="formState.name + '-profile-pic'" class="w-100 border-radius-lg shadow-sm">
                             <a href="javascript:;" class="btn btn-sm btn-icon-only bg-gradient-light position-absolute bottom-0 end-0 mb-n2 me-n2" @click="edit_image_button" id="edit-image-button">
@@ -62,15 +62,13 @@
                 <div class="card-body pt-4 p-3">
                     <form action="/user-profile" method="POST" role="form text-left" enctype="multipart/form-data" @submit.prevent="updateProfile">
 
-<!--                        @if($errors->any())
-                        <div class="mt-3  alert alert-primary alert-dismissible fade show" role="alert">
+                        <div v-for="(error, index) in formState.errors" :key="index" class="mt-3  alert alert-primary alert-dismissible fade show" role="alert" v-if="showProfileAlert && formState.errors">
                             <span class="alert-text text-white">
-                            {{$errors->first()}}</span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            {{error}}</span>
+                            <button type="button" class="btn-close" @click="showProfileAlert = false" aria-label="Close">
                                 <i class="fa fa-close" aria-hidden="true"></i>
                             </button>
                         </div>
-                        @endif-->
 <!--                        @if(session('success'))
                         <div class="m-3  alert alert-success alert-dismissible fade show" id="alert-success" role="alert">
                             <span class="alert-text text-white">
@@ -85,12 +83,11 @@
                                 <div class="form-group">
                                     <input type="file" id="profile-image-input" @change="handleFileChange" class="d-none" accept="image/*">
                                     <label for="user-name" class="form-control-label">Full Name</label>
-                                    <div class="">
-                                        <input class="form-control" v-model="formState.name" type="text" placeholder="Name" id="user-name">
-<!--                                        <input class="form-control" value="{{ auth()->user()->name }}" type="text" placeholder="Name" id="user-name" name="name">-->
-<!--                                        @error('name')
-                                        <p class="text-danger text-xs mt-2">{{ $message }}</p>
-                                        @enderror-->
+                                    <div >
+                                        <input :class="['form-control',formState.errors.name ? 'border border-danger rounded-3' : '']" v-model="formState.name" type="text" placeholder="Name" id="user-name">
+
+                                        <p v-if="formState.errors.name" class="text-danger text-xs mt-2">{{ formState.errors.name }}</p>
+
                                     </div>
                                 </div>
                             </div>
@@ -98,11 +95,10 @@
                                 <div class="form-group">
                                     <label for="user-email" class="form-control-label">Email</label>
 <!--                                    <div class="@error('email')border border-danger rounded-3 @enderror">-->
-                                    <div class="">
-                                        <input class="form-control" v-model="formState.email" type="email" placeholder="@example.com" id="user-email">
-<!--                                        @error('email')
-                                        <p class="text-danger text-xs mt-2">{{ $message }}</p>
-                                        @enderror-->
+                                    <div >
+                                        <input :class="['form-control',formState.errors.email ? 'border border-danger rounded-3' : '']" v-model="formState.email" type="email" placeholder="@example.com" id="user-email">
+
+                                        <p v-if="formState.errors.email" class="text-danger text-xs mt-2">{{ formState.errors.email }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -111,27 +107,30 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="user.phone" class="form-control-label">Phone</label>
-                                    <div class="">
-                                        <input class="form-control" type="tel" placeholder="40770888444" id="number" v-model="formState.phone">
-<!--                                        @error('phone')
-                                        <p class="text-danger text-xs mt-2">{{ $message }}</p>
-                                        @enderror-->
+                                    <div >
+                                        <input :class="['form-control',formState.errors.phone ? 'border border-danger rounded-3' : '']" type="tel" placeholder="40770888444" id="number" v-model="formState.phone">
+
+                                        <p v-if="formState.errors.phone" class="text-danger text-xs mt-2">{{ formState.errors.phone }}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="user.location" class="form-control-label">Location</label>
-                                    <div class="">
-                                        <input class="form-control" type="text" placeholder="Location" id="name" v-model="formState.location">
+                                    <div >
+                                        <input :class="['form-control', formState.errors.location ? 'border border-danger rounded-3' : '']" type="text" placeholder="Location" id="name" v-model="formState.location">
+
+                                        <p v-if="formState.errors.location" class="text-danger text-xs mt-2">{{ formState.errors.location }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="about">About Me</label>
-                            <div class="">
-                                <textarea class="form-control" id="about" rows="3" placeholder="Say something about yourself" v-model="formState.about_me">{{ formState.about_me }}</textarea>
+                            <div >
+                                <textarea :class="['form-control', formState.errors.about_me ? 'border border-danger rounded-3' : '']" id="about" rows="3" placeholder="Say something about yourself" v-model="formState.about_me">{{ formState.about_me }}</textarea>
+
+                                <p v-if="formState.errors.about_me" class="text-danger text-xs mt-2">{{ formState.errors.about_me }}</p>
                             </div>
                         </div>
 
@@ -150,15 +149,14 @@
                 <div class="card-body pt-4 p-3">
                     <form action="/change-password" method="POST" role="form text-left" @submit.prevent="updatePassword">
 
-<!--                        @if($errors->any())
-                        <div class="mt-3  alert alert-primary alert-dismissible fade show" role="alert">
+
+                        <div v-for="(error, index) in formState.errors" :key="index" class="mt-3  alert alert-primary alert-dismissible fade show" role="alert" v-if="showPasswordAlert && formState.errors">
                             <span class="alert-text text-white">
-                            {{$errors->first()}}</span>
+                            {{error}}</span>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                                 <i class="fa fa-close" aria-hidden="true"></i>
                             </button>
                         </div>
-                        @endif-->
 <!--                        @if(session('success'))
                         <div class="m-3  alert alert-success alert-dismissible fade show" id="alert-success" role="alert">
                             <span class="alert-text text-white">
@@ -214,7 +212,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref, reactive, computed} from 'vue';
+import {onMounted, ref, reactive, computed, watch} from 'vue';
 
 const auth = ref([]);
 const formState = reactive({
@@ -228,7 +226,11 @@ const formState = reactive({
    location  : '',
    about_me  : '',
     errors : {}
-})
+});
+
+
+const showProfileAlert = ref(false);
+const showPasswordAlert = ref(false);
 
 const fetchAuth = async () => {
     await axios.get('/api/user_profile')
@@ -241,6 +243,10 @@ const fetchAuth = async () => {
             formState.location = response.data.auth.location;
             formState.about_me = response.data.auth.about_me;
             auth.value = response.data.auth
+
+            // let imageName = formState.image.split('/').pop();
+            // console.log("Form state in fetchAuth: ",formState.image);
+            // console.log("Image Name is : ",imageName);
         }).catch(error=>{
             console.error(error);
         })
@@ -259,13 +265,19 @@ onMounted(()=>{
 })
 
 const updateProfile = async () => {
+    let imageName = formState.image.split('/').pop();
+
     await axios.post('/api/update_profile', {
-        image: formState.image,
+        // image: formState.image,
         name: formState.name,
         email: formState.email,
         phone: formState.phone,
         location: formState.location,
         about_me: formState.about_me,
+    },{
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
     }).then(response=>{
         console.log(response.data);
     }).catch(error=>{
@@ -280,11 +292,32 @@ const updateProfile = async () => {
                 general: 'An unexpected error occurred. Please try again later.'
             };
         }
+        showProfileAlert.value = true;
     })
 }
 
 const updatePassword = () => {
-    //
+    axios.post('/api/update_password', {
+        password: formState.password,
+        new_password: formState.new_password,
+        new_password_confirmation: formState.new_password_confirmation,
+    }).then(response=>{
+        console.log(response.data);
+        showPasswordAlert.value = false;
+    }).catch(error=>{
+        console.error(error);
+        if (error.response.status == 422) {
+            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                return acc;
+            }, {});
+        } else {
+            formState.errors = {
+                general: 'An unexpected error occurred. Please try again later.'
+            };
+        }
+        showPasswordAlert.value = true;
+    })
 }
 
 const edit_image_button = () => {

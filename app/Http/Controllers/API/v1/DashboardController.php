@@ -61,7 +61,7 @@ class DashboardController extends Controller
     public function update_profile(UserProfileRequest $request){
         try {
 
-            if ($request->hasFile('image')) {
+            /*if ($request->hasFile('image')) {
                 $file = $request->file('image');
 
                 // Get the original file name and extension
@@ -71,10 +71,10 @@ class DashboardController extends Controller
 
                 // Save the image path to the user's profile
                 $attributes['image'] = 'assets/img/profile_images/' . $originalName;
-            }
+            }*/
             User::where('id',Auth::user()->id)
                 ->update([
-                    'image'    => $attributes['image'] ?? Auth::user()->image,
+//                    'image'    => $attributes['image'] ?? Auth::user()->image,
                     'name'    => $request['name'],
                     'email' => $request['email'],
                     'phone'     => $request['phone'],
@@ -98,10 +98,10 @@ class DashboardController extends Controller
             $user = Auth::user();
 
             // Check if current password matches
-            if (!Hash::check($request['current_password'], $user->password)) {
+            if (!Hash::check($request['password'], $user->password)) {
                 return response()->json([
                     'message' => 'The current password is incorrect.',
-                ], 404);
+                ], 422);
             }
 
             // Update the user's password
