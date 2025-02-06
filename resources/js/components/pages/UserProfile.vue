@@ -281,7 +281,6 @@ const updateProfile = async () => {
     }).then(response=>{
         console.log(response.data);
     }).catch(error=>{
-        console.error(error);
         if (error.response.status == 422) {
             formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
                 acc[field] = error.response.data.errors[field][0]; // Get the first error message
@@ -305,7 +304,6 @@ const updatePassword = () => {
         console.log(response.data);
         showPasswordAlert.value = false;
     }).catch(error=>{
-        console.error(error);
         if (error.response.status == 422) {
             formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
                 acc[field] = error.response.data.errors[field][0]; // Get the first error message
