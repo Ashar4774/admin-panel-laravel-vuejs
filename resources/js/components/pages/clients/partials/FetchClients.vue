@@ -5,9 +5,9 @@
         <td>{{ client.arrears ?? 0  }}</td>
         <td>{{ client.bad_debts ?? 0 }}</td>
         <td class="text-center">
-            <a href="#" class="mx-3" data-bs-toggle="tooltip" title="View User">
+            <router-link :to="{ name: 'client.show', params:{id: client.id} }" class="mx-3" data-bs-toggle="tooltip" title="View User">
                 <i class="fa-solid fa-eye text-secondary"></i>
-            </a>
+            </router-link>
             <router-link :to="{ name: 'client.state_of_account', params:{id: client.id} }" class="" data-bs-toggle="tooltip" title="State of Account">
                 <i class="fa-solid fa-file-invoice text-secondary"></i>
             </router-link>

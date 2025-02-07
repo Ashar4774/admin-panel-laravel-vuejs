@@ -6,6 +6,7 @@ import PanelLayout from '../components/PanelLayout.vue';
 import Dashboard from '../components/pages/Dashboard.vue';
 import StateOfAccount from '../components/pages/StateOfAccount.vue';
 import ClientIndex from '../components/pages/clients/Index.vue';
+import ClientShow from '../components/pages/clients/Show.vue';
 import ClientStateOfAccount from '../components/pages/clients/StateOfAccount.vue';
 import InvoiceIndex from '../components/pages/invoices/Index.vue';
 import UserProfile from '../components/pages/UserProfile.vue';
@@ -32,6 +33,16 @@ const routes = [
         path: '/client',
         name: 'client',
         component: ClientIndex,
+        meta: {
+            layout: 'PanelLayout',
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/client/:id',
+        name: 'client.show',
+        component: ClientShow,
+        props: true,
         meta: {
             layout: 'PanelLayout',
             requiresAuth: true

@@ -112,6 +112,7 @@ class ClientController extends Controller
         try {
             $client = Client::with('invoices')->findOrFail($id);
             if ($client) {
+                $client->payment = $client->calculatePayments();
                 $client->arrears = $client->calculateArrears();
                 $client->bad_debt = $client->calculateBadDebts();
 

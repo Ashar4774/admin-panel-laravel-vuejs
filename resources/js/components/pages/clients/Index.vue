@@ -112,7 +112,7 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
                     total: response.data.total
                 });
 
-                console.log(response.data)
+
             }).catch(error=>{
 
             })
