@@ -208,6 +208,45 @@
                 </div>
             </div>
         </div>
+
+        <!--    Modal for update image -->
+        <div v-if="updateImageModel" :class="['modal', updateImageModel ? 'd-block' : 'd-none' ]" id="updateImageModel">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importInvoiceModelLabel">Update Image</h5>
+                        <button type="button" class="btn-close bg-dark" @click="updateImageModelClose">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" id="importInvoiceForm" enctype="multipart/form-data" @submit.prevent="updateImageForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+<!--                                        <input type="file" class="" id="invoice_file" @change="handleImageUpdate">-->
+                                        <img :src="updateImagePrev" alt="">
+                                        <input type="file" id="profile-image-input" @change="handleFileChange" accept="image/*">
+                                        <small v-if="formState.errors.image" class="error text-danger">
+                                            {{ formState.errors.image }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div>
+                                <button type="submit" id="submitHandleImageBtn" class="btn bg-gradient-success">Update</button>
+
+                                <div id="loader" style="display: none; margin-left: 10px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -231,6 +270,9 @@ const formState = reactive({
 
 const showProfileAlert = ref(false);
 const showPasswordAlert = ref(false);
+const updateImageModel = ref(false);
+
+const updateImagePrev = ref('');
 
 const fetchAuth = async () => {
     await axios.get('/api/user_profile')
@@ -263,6 +305,32 @@ const asset = (path) => {
 onMounted(()=>{
     fetchAuth();
 })
+
+const updateImageForm = async () => {
+    await axios.post('/api/update_profile_image',{
+        image: formState.image,
+    },{
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then(response=>{
+        console.log(response.data);
+        updateImageModel.value = false;
+        fetchAuth();
+    }).catch(error=>{
+        if (error.response.status == 422) {
+            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                return acc;
+            }, {});
+        } else {
+            formState.errors = {
+                general: 'An unexpected error occurred. Please try again later.'
+            };
+        }
+        // showProfileAlert.value = true;
+    })
+}
 
 const updateProfile = async () => {
     let imageName = formState.image.split('/').pop();
@@ -319,15 +387,24 @@ const updatePassword = () => {
 }
 
 const edit_image_button = () => {
-    document.getElementById('profile-image-input').click();
+    updateImageModel.value = true;
+}
+
+const updateImageModelClose = () => {
+    updateImageModel.value = false;
+    fetchAuth();
 }
 
 const handleFileChange = (event) => {
     const file = event.target.files[0]; // Get the selected file
     if (file) {
         formState.image = file; // Update the form state
-        authImage.value = URL.createObjectURL(file); // Generate a preview URL
+        updateImagePrev.value = URL.createObjectURL(file); // Generate a preview URL
     }
+}
+
+const handleImageUpdate = () => {
+    //
 }
 
 </script>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\v1\Auth\UpdatePasswordRequest;
 use App\Http\Requests\API\v1\Auth\UserProfileRequest;
+use App\Http\Requests\API\v1\Auth\UserProfileImageRequest;
 use App\Models\Client;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -53,6 +54,36 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'There is error while fetching logged in user, please check if user is logged in or not.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update_profile_image(UserProfileImageRequest $request){
+        try {
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+
+                // Get the original file name and extension
+                $originalName = $file->getClientOriginalName();
+                $destinationPath = public_path('assets/img/profile_images');
+                $file->move($destinationPath, $originalName);
+
+                // Save the image path to the user's profile
+                $attributes['image'] = 'assets/img/profile_images/' . $originalName;
+            }
+            User::where('id',Auth::user()->id)
+                ->update([
+                    'image'    => $attributes['image'] ?? Auth::user()->image,
+                ]);
+
+            return response()->json([
+               'message' => 'Image profile updated successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is something wrong while updating image, please try again.',
                 'error' => $e->getMessage()
             ], 500);
         }

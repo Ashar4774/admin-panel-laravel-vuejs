@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('/state_of_account/show/{ref_no}', [StateOfAccountController::class, 'show']);
     Route::get('/user_profile', [DashboardController::class, 'user_profile']);
+    Route::post('/update_profile_image', [DashboardController::class, 'update_profile_image']);
     Route::post('/update_profile', [DashboardController::class, 'update_profile']);
     Route::post('/update_password', [DashboardController::class, 'update_password']);
 
