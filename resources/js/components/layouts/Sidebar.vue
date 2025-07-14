@@ -3,8 +3,8 @@
 <div class="sidenav-header">
     <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
     <a class="align-items-center d-flex m-0 navbar-brand text-wrap" href="#">
-        <img src="" class="navbar-brand-img h-100" alt="...">
-        <span class="ms-3 font-weight-bold text-capitalize">Admin</span>
+        <img :src={authImage} class="navbar-brand-img h-100" alt="admin-profile-pic">
+        <span class="ms-3 font-weight-bold text-capitalize">{{ formData.name }}</span>
     </a>
 </div>
 <hr class="horizontal dark mt-0">
@@ -79,3 +79,35 @@
 </div>
 </aside>
 </template>
+<script setup>
+    import { onMounted,computed, reactive } from 'vue';
+    import axios from "axios";
+
+    const formData = reactive({
+        image: '',
+        name: ''
+    });
+
+    const fetchAuth = async () => {
+        await axios.get('/api/user_profile')
+            .then(response=>{
+                formData.image = response.data.auth.image;
+                formData.name = response.data.auth.name;
+            }).catch(error=>{
+                console.error(error);
+
+        })
+    }
+
+    const authImage = computed(()=>{
+        return formData.image ? asset(formData.image) : asset('./assets/img/bruce-mars.jpg');
+    })
+
+    const asset = (path) => {
+        return `${window.location.origin}/${path}`;
+    }
+
+    onMounted(()=>{
+        fetchAuth();
+    })
+</script>
