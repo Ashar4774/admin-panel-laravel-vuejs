@@ -286,9 +286,6 @@ const fetchAuth = async () => {
             formState.about_me = response.data.auth.about_me;
             auth.value = response.data.auth
 
-            // let imageName = formState.image.split('/').pop();
-            // console.log("Form state in fetchAuth: ",formState.image);
-            // console.log("Image Name is : ",imageName);
         }).catch(error=>{
             console.error(error);
         })
@@ -314,7 +311,6 @@ const updateImageForm = async () => {
             'Content-Type': 'multipart/form-data',
         },
     }).then(response=>{
-        console.log(response.data);
         updateImageModel.value = false;
         fetchAuth();
     }).catch(error=>{
@@ -333,7 +329,7 @@ const updateImageForm = async () => {
 }
 
 const updateProfile = async () => {
-    let imageName = formState.image.split('/').pop();
+    // let imageName = formState.image.split('/').pop();
 
     await axios.post('/api/update_profile', {
         // image: formState.image,

@@ -7,7 +7,7 @@
                     <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
                     <li class="breadcrumb-item text-sm text-dark active text-capitalize" aria-current="page">{{ formattedPath }}</li>
                 </ol>
-                <h6 class="font-weight-bolder mb-0 text-capitalize">{{ formattedPath }}</h6>
+<!--                <h6 class="font-weight-bolder mb-0 text-capitalize">{{ formattedPath }}</h6>-->
             </nav>
             <div class="navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4 d-flex justify-content-end" id="navbar">
 
@@ -127,7 +127,7 @@
     const router = useRouter();
 
     const currentPath = window.location.pathname;
-    const formattedPath = computed(()=> currentPath.replace(/-/g, ' '));
+    const formattedPath = computed(()=> currentPath.replace(/^\//, '').replace(/-/g, ' '));
 
     const logout = () => {
         axios.post('api/logout')
