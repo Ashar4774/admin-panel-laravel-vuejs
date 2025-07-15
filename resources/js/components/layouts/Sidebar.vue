@@ -11,7 +11,7 @@
 <div :class="['navbar-collapse w-auto', { 'd-none': !isSidebarVisible, 'd-xl-block': true }]" id="sidenav-collapse-main">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <router-link class="nav-link " :to="{name: 'dashboard'}">
+            <router-link class="nav-link " :to="{name: 'dashboard'}" @click.native="updateBreadcrum('dashboard')">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <title>shop </title>
@@ -31,7 +31,7 @@
             </router-link>
         </li>
         <li class="nav-item">
-            <router-link class="nav-link" :to="{name: 'client'}">
+            <router-link class="nav-link" :to="{name: 'client'}" @click.native="updateBreadcrum('client')">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <title>customer-support</title>
@@ -52,7 +52,7 @@
             </router-link>
         </li>
         <li class="nav-item">
-            <router-link class="nav-link" :to="{name: 'invoice'}">
+            <router-link class="nav-link" :to="{name: 'invoice'}" @click.native="updateBreadcrum('invoice')">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <img src="/assets/img/icons/invoice.png" width="12px" height="12px" alt="invoice-img">
                 </div>
@@ -60,7 +60,7 @@
             </router-link>
         </li>
         <li class="nav-item">
-            <router-link class="nav-link" :to="{name: 'state_of_account'}">
+            <router-link class="nav-link" :to="{name: 'state_of_account'}" @click.native="updateBreadcrum('state_of_account')">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <img src="/assets/img/icons/balance-sheet.png" style="max-width: unset; height: 12px;" alt="balance-sheet-img">
                 </div>
@@ -68,7 +68,7 @@
             </router-link>
         </li>
         <li class="nav-item">
-            <router-link class="nav-link " :to="{ name: 'user_profile' }">
+            <router-link class="nav-link " :to="{ name: 'user_profile' }" @click.native="updateBreadcrum('user_profile')">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <img src="/assets/img/icons/setting.png" width="12px" height="12px" alt="user-profile-img">
                 </div>
@@ -83,6 +83,10 @@
     import { onMounted,computed, reactive } from 'vue';
     import store from '@/state/index.js';
     import axios from "axios";
+
+    const updateBreadcrum = (breadcrum) => {
+        store.dispatch('setBreadcrum', breadcrum);
+    }
 
     const formData = reactive({
         image: '',

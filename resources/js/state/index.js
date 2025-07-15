@@ -5,7 +5,8 @@ export default createStore({
     state: {
         token: localStorage.getItem('token') || '',
         isAuthenticated: false,
-        isSidebarVisible: ''
+        isSidebarVisible: '',
+        breadcrum: 'dashboard'
     },
 
     mutations: {
@@ -40,6 +41,11 @@ export default createStore({
 
         setSidebarVisible(state, isVisible){
             state.isSidebarVisible = isVisible;
+        },
+
+    //     change Breadcrum
+        setBreadcrum(state, value){
+            state.breadcrum = value
         }
     },
 
@@ -76,6 +82,11 @@ export default createStore({
 
         setSidebarVisible({commit}, isVisible){
             commit('setSidebarVisible', isVisible)
+        },
+
+    //     Change Breadcrum
+        setBreadcrum({commit}, value){
+            commit('setBreadcrum', value)
         }
     },
 
