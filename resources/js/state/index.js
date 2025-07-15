@@ -4,7 +4,8 @@ import axios from "@/axios.js";
 export default createStore({
     state: {
         token: localStorage.getItem('token') || '',
-        isAuthenticated: false
+        isAuthenticated: false,
+        isSidebarVisible: ''
     },
 
     mutations: {
@@ -30,6 +31,15 @@ export default createStore({
             state.isAuthenticated = false
             console.log(state.token)
             console.log(state.isAuthenticated)
+        },
+
+    //     Toggle menu button
+        toggleSidebar(state){
+            state.isSidebarVisible = !state.isSidebarVisible;
+        },
+
+        setSidebarVisible(state, isVisible){
+            state.isSidebarVisible = isVisible;
         }
     },
 
@@ -57,6 +67,15 @@ export default createStore({
             commit('logoutUser')
             localStorage.removeItem('token')
             delete axios.defaults.headers.common['Authorization']
+        },
+
+    //     toggle menu button
+        toggleSidebar({commit}) {
+            commit('toggleSidebar')
+        },
+
+        setSidebarVisible({commit}, isVisible){
+            commit('setSidebarVisible', isVisible)
         }
     },
 

@@ -1,14 +1,14 @@
 <template>
-<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white" id="sidenav-main">
+<aside class="navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white" :class="[{ 'sidenav': !isSidebarVisible, 'z-index-1': true }]" id="sidenav-main">
 <div class="sidenav-header">
     <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-    <a class="align-items-center d-flex m-0 navbar-brand text-wrap" href="#">
+    <a class="align-items-center d-flex m-0 navbar-brand text-wrap justify-center py-4" href="#">
         <img :src=authImage class="navbar-brand-img h-100" alt="admin-profile-pic">
         <span class="ms-3 font-weight-bold text-capitalize">{{ formData.name }}</span>
     </a>
 </div>
 <hr class="horizontal dark mt-0">
-<div class=" navbar-collapse  w-auto" id="sidenav-collapse-main">
+<div :class="['navbar-collapse w-auto', { 'd-none': !isSidebarVisible, 'd-xl-block': true }]" id="sidenav-collapse-main">
     <ul class="navbar-nav">
         <li class="nav-item">
             <router-link class="nav-link " :to="{name: 'dashboard'}">
@@ -81,12 +81,15 @@
 </template>
 <script setup>
     import { onMounted,computed, reactive } from 'vue';
+    import store from '@/state/index.js';
     import axios from "axios";
 
     const formData = reactive({
         image: '',
         name: ''
     });
+
+    const isSidebarVisible = computed(()=> store.state.isSidebarVisible)
 
     const fetchAuth = async () => {
         await axios.get('/api/user_profile')

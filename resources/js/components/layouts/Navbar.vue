@@ -25,7 +25,7 @@
                         </a>
                     </li>
                     <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                        <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                        <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav" @click="toggleSidebar">
                             <div class="sidenav-toggler-inner">
                                 <i class="sidenav-toggler-line"></i>
                                 <i class="sidenav-toggler-line"></i>
@@ -120,7 +120,7 @@
 
 <script setup>
     import { computed } from 'vue';
-    // import axios from "axios";
+
     import state from "@/state/index.js";
     import {useRouter} from "vue-router";
 
@@ -129,6 +129,9 @@
     const currentPath = window.location.pathname;
     const formattedPath = computed(()=> currentPath.replace(/^\//, '').replace(/-/g, ' '));
 
+    const toggleSidebar = () => {
+        state.dispatch('toggleSidebar')
+    }
     const logout = () => {
         axios.post('api/logout')
         .then(response=>{
