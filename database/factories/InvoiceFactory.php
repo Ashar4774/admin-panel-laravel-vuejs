@@ -24,15 +24,15 @@ class InvoiceFactory extends Factory
         $amount = $this->faker->randomFloat(2, 100, 10000); // Random amount between 100 and 10,000
         $rcdAmount = $this->faker->optional()->randomFloat(2, 50, $amount); // Optional received amount
         $badDebtAmount = $this->faker->optional()->numberBetween(0, $amount);
-        $dueDate = $this->faker->optional()->dateTimeBetween('-1 year', 'now');
+        $dueDate = $this->faker->dateTimeBetween('-1 year', 'now');
         $rcdDueDate = $this->faker->optional()->dateTimeBetween($dueDate, 'now');
 //        $badDebtAmount = $status === 'bad_debts' ? $this->faker->randomFloat(2, 0, $amount - $rcdAmount) : null;
 
         return [
-            'clients_id' => Client::factory(),
+            'clients_id' => Client::inRandomOrder()->first()?->id ?? Client::factory(),
             'due_date' => $dueDate->format('Y-m-d'),
             'amount' => $amount,
-            'rcd_due_date' => $rcdDueDate->format('Y-m-d'),
+            'rcd_due_date' => $rcdDueDate?->format('Y-m-d'),
             'rcd_amount' => $rcdAmount,
             'bad_debt_amount' => $badDebtAmount,
             'invoice_year' => $this->faker->year() . '-' . $this->faker->month(),

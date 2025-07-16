@@ -19,7 +19,7 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'ref_no' => strtoupper('REF'. $this->faker->unique()->numerify('###')),
+            'ref_no' => 'REF' . str_pad($this->faker->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
             'name' => $this->faker->name,
             'created_at' => now(),
             'updated_at' => now(),
