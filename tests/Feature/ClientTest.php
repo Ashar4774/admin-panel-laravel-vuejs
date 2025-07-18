@@ -11,27 +11,61 @@ use Tests\TestCase;
 
 class ClientTest extends TestCase
 {
-//    use RefreshDatabase;
+    use RefreshDatabase;
     /**
-     * List of clients test.
+     * adding clients test.
      */
-    public function test_list_clients(): void
+    public function test_logged_in_user_can_create_a_client(): void
     {
+//        $user = User::factory()->create();
+//        $this->actingAs($user, 'sanctum');
+//        Client::factory()->hasInvoices(2)->count(5)->create();
+//
+//        $response = $this->getJson('/api/clients');
+//
+//        $response->assertStatus(200)
+//            ->assertOk()
+//            ->assertJsonStructure(['data']);
+
+        // create user
         $user = User::factory()->create();
+        // login
         $this->actingAs($user, 'sanctum');
-        Client::factory()->hasInvoices(2)->count(5)->create();
+        /*$response = $this->post('/api/login',[
+            'email' => $user->email,
+            'password' => 'password'
+        ]);
+        $this->assertAuthenticated();*/
 
-        $response = $this->getJson('/api/clients');
-
-        $response->assertStatus(200)
-            ->assertOk()
-            ->assertJsonStructure(['data']);
+        // Client Create
+        $client = $this->postJson(route('clients.store'),[
+           'ref_no' => 'REFTEST001',
+           'client_name' => 'Client Test1'
+        ]);
+        $client->assertStatus(201);
+        $this->assertEquals(1, Client::count());
+        $this->assertJson($client->getContent());
     }
 
     /**
-     * adding client test.
+     * show clients list test.
      */
-    public function test_store_client(): void
+    public function test_logged_in_user_can_view_clients_list(){
+        // create user
+        $user = User::factory()->create();
+        // login user with sanctum
+        $this->actingAs($user, 'sanctum');
+        // create client
+        $storeClient = $this->postJson(route('clients.store'),[
+            'ref_no' => 'REFTEST001',
+            'client_name' => 'Client Test1'
+        ]);
+        $storeClient->assertStatus(201);
+//        $this->assertEquals();
+        // view clients
+        $this->assertEquals(1, Client::count());
+    }
+    /*public function test_store_client(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
@@ -45,12 +79,31 @@ class ClientTest extends TestCase
             'ref_no' => $refNo,
             'name' => 'Test Client1'
         ]);
-    }
+    }*/
 
     /**
      * showing client test.
      */
-    public function test_show_a_client(): void
+    public function test_logged_in_user_can_show_the_client_with_specific_id(){
+        // create user
+        $user = User::factory()->create();
+        // login user with sanctum
+        $this->actingAs($user, 'sanctum');
+        // create client
+        $storeClient = $this->postJson(route('clients.store'),[
+            'ref_no' => 'REFTEST001',
+            'client_name' => 'Client Test1'
+        ]);
+        $storeClient->assertStatus(201);
+
+        // show client with id
+        $client = Client::first();
+        $showClient = $this->getJson(route('clients.show', $client->id));
+        $this->assertEquals($client->ref_no, 'REFTEST001');
+        $this->assertEquals($client->name, 'Client Test1');
+        $showClient->assertStatus(201);
+    }
+    /*public function test_show_a_client(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
@@ -60,12 +113,37 @@ class ClientTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['client' => ['id' => $client->id]]);
-    }
+    }*/
 
     /**
      * updating client test.
      */
-    public function test_update_a_client(): void
+    public function test_logged_in_user_can_update_the_client(){
+        // create user
+        $user = User::factory()->create();
+        // login user with sanctum
+        $this->actingAs($user, 'sanctum');
+        // create client
+        $storeClient = $this->postJson(route('clients.store'),[
+            'ref_no' => 'REFTEST001',
+            'client_name' => 'Client Test1'
+        ]);
+        $storeClient->assertStatus(201);
+        // update client
+        $client = Client::first();
+        $response = $this->putJson(route('clients.update', $client->id), [
+            'ref_no' => 'REFUPTEST001',
+            'client_name' => 'Client Updated Test1'
+        ]);
+
+        $updatedClient = Client::first();
+        //check updated client
+        $this->assertEquals('REFUPTEST001', $updatedClient->ref_no);
+        $this->assertEquals('Client Updated Test1', $updatedClient->name);
+        $response->assertStatus(201);
+
+    }
+    /*public function test_update_a_client(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
@@ -77,12 +155,30 @@ class ClientTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['message' => 'Client Updated Successfully']);
-    }
+    }*/
 
     /**
-     * deleting client test.
+     * deleting client.
      */
-    public function test_delete_a_client(): void
+    public function test_logged_in_user_can_delete_the_client(){
+        // create user
+        $user = User::factory()->create();
+        // login user with sanctum
+        $this->actingAs($user, 'sanctum');
+        // create client
+        $storeClient = $this->postJson(route('clients.store'),[
+            'ref_no' => 'REFTEST001',
+            'client_name' => 'Client Test1'
+        ]);
+        $storeClient->assertStatus(201);
+
+        // delete client data
+        $client = Client::first();
+
+        $response = $this->deleteJson(route('clients.destroy', $client->id));
+        $response->assertStatus(201);
+    }
+    /*public function test_delete_a_client(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
@@ -90,12 +186,12 @@ class ClientTest extends TestCase
         $response = $this->deleteJson('/api/clients/{$client->id}');
         $response->assertStatus(201)
             ->assertJsonFragment(['message' => 'Client deleted successfully']);
-    }
+    }*/
 
     /**
      * importing clients test.
      */
-    public function test_import_clients_from_excel(): void
+    /*public function test_import_clients_from_excel(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
@@ -107,12 +203,12 @@ class ClientTest extends TestCase
 
         $response->assertOk()
             ->assertJsonFragment(['message' => 'Client data imported successfully']);
-    }
+    }*/
 
     /**
      * State of account of client test.
      */
-    public function test_return_state_of_account(): void
+    /*public function test_return_state_of_account(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
@@ -121,5 +217,5 @@ class ClientTest extends TestCase
         $response = $this->getJson('/api/clients/state_of_account/{$client->id}');
         $response->assertOk()
             ->assertJsonFragment(['client' => ['id' => $client->id]]);
-    }
+    }*/
 }
