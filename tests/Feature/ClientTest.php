@@ -56,30 +56,16 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = $this->postJson(route('clients.store'),[
+        $client = Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
-            'client_name' => 'Client Test1'
+            'name' => 'Client Test1'
         ]);
-        $storeClient->assertStatus(201);
-//        $this->assertEquals();
+
         // view clients
+        $response = $this->getJson(route('clients.index'));
+        $response->assertStatus(200);
         $this->assertEquals(1, Client::count());
     }
-    /*public function test_store_client(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user, 'sanctum');
-        $refNo = 'REF' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
-        $data = ['ref_no' => $refNo, 'client_name' => 'Test Client1'];
-
-        $response = $this->postJson("/api/clients", $data);
-        $response->assertStatus(201)
-            ->assertJson(['message' => "Client Added Successfully"]);
-        $this->assertDatabaseHas("clients", [
-            'ref_no' => $refNo,
-            'name' => 'Test Client1'
-        ]);
-    }*/
 
     /**
      * showing client test.
@@ -90,30 +76,19 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = $this->postJson(route('clients.store'),[
+        $storeClient = Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
-            'client_name' => 'Client Test1'
+            'name' => 'Client Test1'
         ]);
-        $storeClient->assertStatus(201);
 
         // show client with id
-        $client = Client::first();
+        $client = Client::with('invoices')->first();
         $showClient = $this->getJson(route('clients.show', $client->id));
         $this->assertEquals($client->ref_no, 'REFTEST001');
         $this->assertEquals($client->name, 'Client Test1');
         $showClient->assertStatus(201);
     }
-    /*public function test_show_a_client(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user, 'sanctum');
-        $client = Client::factory()->hasInvoices(2)->create();
 
-        $response = $this->getJson("/api/clients/{$client->id}");
-
-        $response->assertStatus(201)
-            ->assertJsonFragment(['client' => ['id' => $client->id]]);
-    }*/
 
     /**
      * updating client test.
