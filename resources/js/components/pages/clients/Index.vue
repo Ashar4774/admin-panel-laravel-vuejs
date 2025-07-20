@@ -43,22 +43,34 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="pagination mt-3 justify-content-end pe-3 gap-3">
-                            <button
-                                class="btn btn-sm btn-secondary"
-                                :disabled="pagination.current_page === 1"
-                                @click="changePage(pagination.current_page - 1)"
-                            >
-                                Previous
-                            </button>
-                            <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
-                            <button
-                                class="btn btn-sm btn-secondary"
-                                :disabled="pagination.current_page === pagination.last_page"
-                                @click="changePage(pagination.current_page + 1)"
-                            >
-                                Next
-                            </button>
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex justify-content-start align-items-center px-3 mb-2">
+                                <label for="perPage" class="me-2 mb-0">Show:</label>
+                                <select id="perPage" v-model="perPage" @change="changePerPage" class="form-select form-select-sm w-auto">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="ms-2">entries</span>
+                            </div>
+                            <div class="pagination mt-3 justify-content-end pe-3 gap-3">
+                                <button
+                                    class="btn btn-sm btn-secondary"
+                                    :disabled="pagination.current_page === 1"
+                                    @click="changePage(pagination.current_page - 1)"
+                                >
+                                    Previous
+                                </button>
+                                <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+                                <button
+                                    class="btn btn-sm btn-secondary"
+                                    :disabled="pagination.current_page === pagination.last_page"
+                                    @click="changePage(pagination.current_page + 1)"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -100,10 +112,10 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
         last_page: 1,
         total: 0
     });
-
+    const perPage = ref(10);
 
     const fetchClients = async (page=1) => {
-        await axios.get(`/api/clients?page=${page}`)
+        await axios.get(`/api/clients?page=${page}&per_page=${perPage.value}`)
             .then(response=>{
                 clients.value = response.data.data;
                 pagination.value = reactive({
@@ -122,6 +134,10 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
         if(page !== pagination.value.current_page){
             fetchClients(page);
         }
+    }
+
+    const changePerPage = () => {
+        fetchClients(1);
     }
 
     onMounted(()=>{

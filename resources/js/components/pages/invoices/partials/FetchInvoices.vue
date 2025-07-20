@@ -10,9 +10,9 @@
         <td>{{ invoice.formatted_rcd_due_date ?? '-' }}</td>
         <td>{{ invoice.rcd_due_date ? invoice.time_gap : '-' }}</td>
         <td>{{ invoice.bad_debt_amount ?? 0 }}</td>
-        <td>{{ invoice.status }}</td>
+<!--        <td>{{ invoice.status }}</td>-->
         <td>{{ invoice.payment_type ?? '-' }}</td>
-        <td>{{ invoice.notes ?? '-' }}</td>
+<!--        <td>{{ invoice.notes ?? '-' }}</td>-->
         <td>{{ (invoice.rcd_amount != null || invoice.bad_debt_amount != null) ? 'Paid' : 'Unpaid' }}</td>
         <td class="text-center text-white">
             <a href="#" :class="( invoice.rcd_amount == null && invoice.bad_debt_amount == null ) ? 'mx-2' : '' " data-bs-toggle="tooltip" title="View Invoice">

@@ -18,7 +18,8 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $invoices = Invoice::with('clients')->orderBy('updated_at','desc')->paginate(10);
+        $perPage = $request->get('per_page', 10);
+        $invoices = Invoice::with('clients')->orderBy('updated_at','desc')->paginate($perPage);
         return response()->json($invoices);
     }
 

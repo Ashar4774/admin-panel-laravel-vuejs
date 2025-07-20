@@ -18,9 +18,10 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
+        $perPage = $request->get('per_page');
         $clients = Client::with('invoices')
             ->orderBy('updated_at', 'desc')
-            ->paginate(10);
+            ->paginate($perPage);
 
         // Map over the items in the paginated collection
         $clients->getCollection()->transform(function ($client) {

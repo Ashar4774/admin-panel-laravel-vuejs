@@ -16,7 +16,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_clients_ref" class="form-label">Ref #</label>
-                                        <input type="number" list="clientList" class="form-control form-control-sm filter_clients_ref" id="filter_clients_ref" name="clients_id" placeholder="Client Ref No.">
+                                        <input type="text" list="clientList" class="form-control form-control-sm filter_clients_ref" id="filter_clients_ref" name="clients_id" placeholder="Client Ref No.">
                                         <datalist id="clientList" >
 <!--                                            @foreach($clients as $client)
                                             <option value="{{ $client->ref_no }}" data-name="{{ $client->name }}" data-ref="{{ $client->ref_no }}" data-id="{{ $client->id }}">{{ $client->ref_no }}</option>
@@ -158,15 +158,15 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Bad Debt amount
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+<!--                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         client status
-                                    </th>
+                                    </th>-->
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Payment Type
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+<!--                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Notes
-                                    </th>
+                                    </th>-->
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Invoice status
                                     </th>
@@ -181,6 +181,36 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex justify-content-start align-items-center px-3 mb-2">
+                                <label for="perPage" class="me-2 mb-0">Show:</label>
+                                <select id="perPage" v-model="perPage" @change="changePerPage" class="form-select form-select-sm w-auto">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="ms-2">entries</span>
+                            </div>
+                            <div class="pagination mt-3 justify-content-end pe-3 gap-3">
+                                <button
+                                    class="btn btn-sm btn-secondary"
+                                    :disabled="pagination.current_page === 1"
+                                    @click="changePage(pagination.current_page - 1)"
+                                >
+                                    Previous
+                                </button>
+                                <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+                                <button
+                                    class="btn btn-sm btn-secondary"
+                                    :disabled="pagination.current_page === pagination.last_page"
+                                    @click="changePage(pagination.current_page + 1)"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="card-footer px-0 pt-2 pb-0 ps-4">
                         <div class="d-flex " style="gap: 20px">
@@ -257,6 +287,8 @@ const pagination = ref({
     total: 0
 });
 
+const perPage = ref(10);
+
 
 // Get the current date
 const today = new Date();
@@ -284,7 +316,7 @@ onMounted(() => {
 })
 
 const fetchInvoices = async (page) => {
-    await axios.get(`/api/invoices?page=${page}`)
+    await axios.get(`/api/invoices?page=${page}&per_page=${perPage.value}`)
         .then(response=>{
             invoices.value = response.data.data;
             pagination.value = reactive({
@@ -295,6 +327,16 @@ const fetchInvoices = async (page) => {
         }).catch(error=>{
 
         })
+}
+
+const changePage = (page) => {
+    if(page !== pagination.value.current_page){
+        fetchInvoices(page);
+    }
+}
+
+const changePerPage = () => {
+    fetchInvoices(1);
 }
 
 // -------- Add Invoice module --------------
