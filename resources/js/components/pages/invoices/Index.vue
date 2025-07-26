@@ -177,7 +177,7 @@
                                 </tbody>-->
                             </table>
                         </div>
-                        <div class="d-flex flex-row justify-content-between">
+<!--                        <div class="d-flex flex-row justify-content-between">
                             <div class="d-flex justify-content-start align-items-center px-3 mb-2">
                                 <label for="perPage" class="me-2 mb-0">Show:</label>
                                 <select id="perPage" v-model="perPage" @change="changePerPage" class="form-select form-select-sm w-auto">
@@ -205,7 +205,7 @@
                                     Next
                                 </button>
                             </div>
-                        </div>
+                        </div>-->
 
                     </div>
                     <div class="card-footer px-0 pt-2 pb-0 ps-4">
@@ -375,7 +375,6 @@ const fetchDataTableInvoices = (page) => {
             url: `/api/invoices/getInvoices?page=${page}&per_page=${perPage.value}`,
             type: 'GET',
             data: function(d){
-                console.log(d);
                 d.clients_id = formFilter.filter_clients_id
                 d.inv_client_name = formFilter.filter_client_name
                 d.amount = formFilter.filter_amount
@@ -410,10 +409,30 @@ const fetchDataTableInvoices = (page) => {
             // { data: 'status' },
             { data: 'payment_type' },
             { data: 'invoice_status' },
-            { data: 'actions', searchable: true }
+            {
+                data: 'actions',
+                searchable: false,
+                orderable: false,
+                render: function(data, type, row) {
+                    return `
+                <a href="#" :class="( invoice.rcd_amount == null && invoice.bad_debt_amount == null ) ? 'mx-2' : '' " data-bs-toggle="tooltip" title="View Invoice">
+                <i class="fa-solid fa-eye text-white-50"></i>
+            </a>
+            <a v-if="invoice.rcd_amount == null && invoice.bad_debt_amount == null" href="#" class="" id="payInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Pay Invoice">
+                <i class="fa-solid fa-file-invoice text-white-50"></i>
+            </a>
+            <a href="#" class="mx-2" id="editInvoice" @click="updateInvoiceModelOpen(invoice.id)" :data-id="invoice.id" data-bs-toggle="tooltip" title="Edit Invoice">
+                <i class="fas fa-user-edit text-white-50"></i>
+            </a>
+            <span>
+                 <i class="cursor-pointer fas fa-trash text-white-50" id="deleteInvoice" @click="deleteInvoiceModelOpen(invoice.id)" :data-id="invoice.id" data-bs-toggle="tooltip" title="Delete Invoice"></i>
+            </span>
+            `;
+                }
+            }
         ],
         createdRow: function (row, data, dataIndex) {
-            // $(row).addClass(data.row_class);
+            $(row).addClass(data.row_class);
             $('td', row).eq(0).addClass('ps-4 invoice_id');
             $('td', row).eq(1).addClass('ref_no');
             $('td', row).eq(2).addClass('client_name');
@@ -438,11 +457,13 @@ const fetchDataTableInvoices = (page) => {
 const changePage = (page) => {
     if(page !== pagination.value.current_page){
         fetchInvoices(page);
+        fetchDataTableInvoices(page);
     }
 }
 
 const changePerPage = () => {
     fetchInvoices(1);
+    fetchDataTableInvoices(1);
 }
 
 // -------- Add Invoice module --------------

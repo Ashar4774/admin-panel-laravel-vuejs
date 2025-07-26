@@ -135,7 +135,7 @@ class InvoiceController extends Controller
 //                'notes' => $invoice->notes ?? '-',
                 'invoice_status' => ($invoice->rcd_amount != null || $invoice->bad_debt_amount != null) ? 'Paid' : 'Unpaid',
                 'row_class' => $rowClass,
-                'actions' => view('invoice.partials.actions', compact('invoice'))->render(),
+//                'actions' => view('invoice.partials.actions', compact('invoice'))->render(),
             ];
         });
         return response()->json([
