@@ -45,4 +45,11 @@ class Invoice extends Model
 
         return round($dueDate->diffInDays($rcdDueDate));
     }
+
+    public function time_gap(){
+        $dueDate = Carbon::parse($this->due_date);
+        $rcdDueDate = Carbon::parse($this->rcd_due_date);
+
+        return round($dueDate->diffInDays($rcdDueDate));
+    }
 }

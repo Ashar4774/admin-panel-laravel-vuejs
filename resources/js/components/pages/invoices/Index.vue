@@ -11,61 +11,57 @@
                         </div>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
-                        <form method="POST" id="filterInvoiceForm" class="p-4">
+                        <form id="filterInvoiceForm" @submit.prevent="filterInvoiceForm" class="p-4">
                             <div class="row">
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_clients_ref" class="form-label">Ref #</label>
-                                        <input type="text" list="clientList" class="form-control form-control-sm filter_clients_ref" id="filter_clients_ref" name="clients_id" placeholder="Client Ref No.">
+                                        <input type="text" list="clientList" class="form-control form-control-sm filter_clients_ref" id="filter_clients_ref" @change="change_clients_list" v-model="formFilter.filter_clients_ref" placeholder="Client Ref No.">
                                         <datalist id="clientList" >
-<!--                                            @foreach($clients as $client)
-                                            <option value="{{ $client->ref_no }}" data-name="{{ $client->name }}" data-ref="{{ $client->ref_no }}" data-id="{{ $client->id }}">{{ $client->ref_no }}</option>
-                                            @endforeach-->
+                                            <option v-for="client in clients" :key="client.id" :value="client.ref_no" :data-name="client.name" :data-ref="client.ref_no" :data-id="client.id">{{ client.ref_no }}</option>
                                         </datalist>
-                                        <input type="number" class="form-control form-control-sm d-none filter_clients_id" id="filter_clients_id" name="clients_id" placeholder="Client Ref No." readonly>
+                                        <input type="number" class="form-control form-control-sm d-none filter_clients_id" id="filter_clients_id" v-model="formFilter.filter_clients_id" placeholder="Client Ref No." readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_client_name" class="form-label">Client Name</label>
-                                        <input name="inv_client_name" list="clientNameList" id="filter_client_name" class="form-control form-control-sm filter_client_name" placeholder="Select Client" autocomplete="off">
+                                        <input type="text" v-model="formFilter.filter_client_name" list="clientNameList" id="filter_client_name" class="form-control form-control-sm filter_client_name" @change="change_clients_list" placeholder="Select Client" >
                                         <datalist id="clientNameList" >
-<!--                                            @foreach($clients as $client)
-                                            <option value="{{ $client->name }}" data-name="{{ $client->name }}" data-ref="{{ $client->ref_no }}" data-id="{{ $client->id }}">{{ $client->name }}</option>
-                                            @endforeach-->
+                                            <option v-for="client in clients" :key="client.id" :value="client.name" :data-name="client.name" :data-ref="client.ref_no" :data-id="client.id">{{ client.name }}</option>
                                         </datalist>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_amount" class="form-label">Amount</label>
-                                        <input type="number" class="form-control form-control-sm" id="filter_amount" name="amount" placeholder="Amount" >
+                                        <input type="number" class="form-control form-control-sm" id="filter_amount" v-model="formFilter.filter_amount" placeholder="Amount" >
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_due_date" class="form-label">Due Date</label>
-                                        <input type="date" class="form-control form-control-sm" id="filter_due_date" name="due_date" placeholder="Due Date">
+                                        <input type="date" class="form-control form-control-sm" id="filter_due_date" v-model="formFilter.filter_due_date" placeholder="Due Date">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_rcd_amount" class="form-label">Received Amount</label>
-                                        <input type="number" class="form-control form-control-sm" id="filter_rcd_amount" name="rcd_amount" placeholder="Received Amount" >
-                                        <input type="checkbox" class="ms-2" id="null_rcd_amount">
+                                        <input type="number" class="form-control form-control-sm" id="filter_rcd_amount" v-model="formFilter.filter_rcd_amount" placeholder="Received Amount" >
+                                        <input type="checkbox" class="ms-2" id="null_rcd_amount" v-model="formFilter.filter_null_rcd_amount">
                                         <label class="form-check-label" for="null_rcd_amount">Nullable</label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_rcd_due_date" class="form-label">Received Date</label>
-                                        <input type="date" class="form-control form-control-sm" id="filter_rcd_due_date" name="rcd_due_date" placeholder="Received Date">
+                                        <input type="date" class="form-control form-control-sm" id="filter_rcd_due_date" v-model="formFilter.filter_rcd_due_date" placeholder="Received Date">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_client_status" class="form-label">Client Status</label>
-                                        <select class="form-control form-control-sm" name="status" id="filter_client_status">
+                                        <select class="form-control form-control-sm" v-model="formFilter.filter_client_status" id="filter_client_status">
                                             <option value="" selected>Select client status</option>
                                             <option value="bad_debts">Bad debt</option>
                                             <option value="good">Received</option>
@@ -75,7 +71,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_payment_type" class="form-label">Payment Type</label>
-                                        <select class="form-control form-control-sm" name="payment_type" id="filter_payment_type">
+                                        <select class="form-control form-control-sm" v-model="formFilter.filter_payment_type" id="filter_payment_type">
                                             <option value="" selected>Select payment type</option>
                                             <option value="bank">Bank</option>
                                             <option value="cash">Cash</option>
@@ -85,15 +81,15 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_bad_debt_amount" class="form-label">Bad Debt. Amount</label>
-                                        <input type="number" class="form-control form-control-sm" id="filter_bad_debt_amount" name="bad_debt_amount" placeholder="Bad Debt. Amount" >
-                                        <input type="checkbox" class="ms-2" id="null_bad_debt_amount">
+                                        <input type="number" class="form-control form-control-sm" id="filter_bad_debt_amount" name="filter_bad_debt_amount" placeholder="Bad Debt. Amount" >
+                                        <input type="checkbox" class="ms-2" id="null_bad_debt_amount" v-model="formFilter.filter_null_bad_debt_amount">
                                         <label class="form-check-label" for="null_bad_debt_amount">Nullable</label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="filter_status" class="form-label">Status</label>
-                                        <select class="form-control form-control-sm" name="invoice_status" id="filter_status">
+                                        <select class="form-control form-control-sm" v-model="formFilter.filter_status" id="filter_status">
                                             <option value="" selected>Select Status</option>
                                             <option value="paid">Paid</option>
                                             <option value="unpaid">Unpaid</option>
@@ -176,9 +172,9 @@
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody>
+<!--                                <tbody>
                                     <FetchInvoices :invoices="invoices" :updateInvoiceModelOpen="updateInvoiceModelOpen" :deleteInvoiceModelOpen="deleteInvoiceModelOpen" />
-                                </tbody>
+                                </tbody>-->
                             </table>
                         </div>
                         <div class="d-flex flex-row justify-content-between">
@@ -253,12 +249,52 @@ import InvoiceDeleteModal from "@/components/pages/invoices/partials/InvoiceDele
 import InvoiceImportModal from "@/components/pages/invoices/partials/InvoiceImportModal.vue";
 import FetchInvoices from "@/components/pages/invoices/partials/FetchInvoices.vue";
 import axios from "@/axios.js";
+import 'datatables.net';
+import 'datatables.net-bs5';
 
 // variables for modal
 const addInvoiceModel = ref(false);
 const deleteInvoiceModel = ref(false);
 const importInvoiceModel = ref(false);
 const updateInvoiceModel = ref(false);
+
+const formFilter = reactive({
+    filter_clients_ref: '',
+    filter_clients_id: '',
+    filter_client_name: '',
+    filter_amount: '',
+    filter_due_date: '',
+    filter_rcd_amount: '',
+    filter_null_rcd_amount: false,
+    filter_rcd_due_date: '',
+    filter_client_status: '',
+    filter_payment_type: '',
+    filter_bad_debt_amount: '',
+    filter_null_bad_debt_amount: false,
+    filter_status: '',
+
+});
+
+const change_clients_list = (e) => {
+    console.log(formFilter.filter_clients_ref);
+    console.log(clients.value);
+
+    const client = clients.value.find(c => c.ref_no === formFilter.filter_clients_ref) || clients.value.find(c => c.name === formFilter.filter_client_name)
+    console.log(client);
+    if (client) {
+        formFilter.filter_clients_ref = client.ref_no
+        formFilter.filter_clients_id = client.id
+        formFilter.filter_client_name = client.name
+    } else {
+        formFilter.filter_clients_ref = ''
+        formFilter.filter_clients_id = ''
+        formFilter.filter_client_name = ''
+    }
+}
+
+const filterInvoiceForm = () => {
+    //
+}
 
 const formState = reactive({
     id: '',
@@ -312,6 +348,7 @@ formState.invoice_year = (startYear.value + '-' + endYear.value);
 
 onMounted(() => {
     fetchClients();
+    fetchDataTableInvoices(1);
     fetchInvoices();
 })
 
@@ -327,6 +364,75 @@ const fetchInvoices = async (page) => {
         }).catch(error=>{
 
         })
+}
+
+const fetchDataTableInvoices = (page) => {
+    $('#invoiceTable').dataTable({
+        processing: true,
+        serverSide: true,
+        destroy: true,
+        ajax: {
+            url: `/api/invoices/getInvoices?page=${page}&per_page=${perPage.value}`,
+            type: 'GET',
+            data: function(d){
+                console.log(d);
+                d.clients_id = formFilter.filter_clients_id
+                d.inv_client_name = formFilter.filter_client_name
+                d.amount = formFilter.filter_amount
+                d.due_date = formFilter.filter_due_date
+                d.rcd_amount = formFilter.filter_rcd_amount
+                d.rcd_due_date = formFilter.filter_rcd_due_date
+                d.status = formFilter.filter_client_status
+                d.payment_type = formFilter.filter_payment_type
+                d.bad_debt_amount = formFilter.filter_bad_debt_amount
+                d.rcd_amount_nullable = formFilter.filter_null_rcd_amount ? 1 : null
+                d.bad_debt_amount_nullable = formFilter.filter_null_bad_debt_amount ? 1 : null
+                d.invoice_status = formFilter.filter_status
+            },
+            beforeSend: function (xhr) {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                }
+            }
+        },
+        columns: [
+            { data: 'id' },
+            { data: 'ref_no' },
+            { data: 'client_name' },
+            { data: 'amount' },
+            { data: 'due_date' },
+            { data: 'invoice_year' },
+            { data: 'rcd_amount' },
+            { data: 'rcd_due_date' },
+            { data: 'time_gap' },
+            { data: 'bad_debt_amount' },
+            // { data: 'status' },
+            { data: 'payment_type' },
+            { data: 'invoice_status' },
+            { data: 'actions', searchable: true }
+        ],
+        createdRow: function (row, data, dataIndex) {
+            // $(row).addClass(data.row_class);
+            $('td', row).eq(0).addClass('ps-4 invoice_id');
+            $('td', row).eq(1).addClass('ref_no');
+            $('td', row).eq(2).addClass('client_name');
+            $('td', row).eq(3).addClass('amount');
+            $('td', row).eq(4).addClass('due_date');
+            $('td', row).eq(5).addClass('invoice_year');
+            $('td', row).eq(6).addClass('rcd_amount');
+            $('td', row).eq(7).addClass('rcd_date');
+            $('td', row).eq(8).addClass('time_gap');
+            $('td', row).eq(9).addClass('bad_debt_amount');
+            $('td', row).eq(10).addClass('client_status');
+            $('td', row).eq(11).addClass('payment_status');
+            // $('td', row).eq(12).addClass('notes');
+            $('td', row).eq(13).addClass('invoice_status');
+            $('td', row).eq(14).addClass('text-center bg-white');
+        },
+        pageLength: 10,
+        lengthMenu: [10, 20, 50, 100]
+    })
 }
 
 const changePage = (page) => {
@@ -345,7 +451,7 @@ const fetchClients = async () => {
         .then(response=>{
             clients.value = response.data;
         }).catch(error=>{
-
+            console.log(error)
         })
 }
 

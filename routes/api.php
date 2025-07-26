@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('clients/state_of_account/{id}', [ClientController::class, 'state_of_account']);
     Route::apiResource('clients', ClientController::class);
 
+    Route::get('invoices/getInvoices', [InvoiceController::class, 'getInvoices'])->name('getInvoices');
     Route::get('invoices/fetchClients', [InvoiceController::class, 'fetchClients'])->name('fetchClients');
     Route::post('invoices/import', [InvoiceController::class, 'import']);
     Route::apiResource('invoices', InvoiceController::class);

@@ -23,6 +23,168 @@ class InvoiceController extends Controller
         return response()->json($invoices);
     }
 
+    public function getInvoices(Request $request)
+    {
+//        dd($request->all());
+//        $invoices = Invoice::with('clients')->select('invoices.*'); // Use select for performance optimization
+        $totalRecords = Invoice::count();
+//        dd($totalRecords);
+
+        $start = $request->input('start'); // Offset
+        $length = $request->input('length'); // Page size
+        $draw = $request->input('draw'); // Draw counter for DataTables
+        $searchValue = $request->input('search.value'); // Search value if applicable
+
+//        dd($length);
+        // Query to fetch the data
+        $query = Invoice::with('clients');
+
+        // Apply filters from the form
+        if ($request->filled('clients_id')) {
+            $query->where('clients_id', $request->input('clients_id'));
+        }
+
+        if ($request->filled('inv_client_name')) {
+            $query->whereHas('clients', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->input('inv_client_name')}%");
+            });
+        }
+
+        if ($request->filled('amount')) {
+            $query->where('amount', $request->input('amount'));
+        }
+
+        if ($request->filled('due_date')) {
+            $query->whereDate('due_date', $request->input('due_date'));
+        }
+
+        if ($request->filled('rcd_amount')) {
+            $query->where('rcd_amount', $request->input('rcd_amount'));
+        }
+
+        if ($request->filled('rcd_due_date')) {
+            $query->whereDate('rcd_due_date', $request->input('rcd_due_date'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('payment_type')) {
+            $query->where('payment_type', $request->input('payment_type'));
+        }
+
+        if ($request->filled('bad_debt_amount')) {
+            $query->where('bad_debt_amount', $request->input('bad_debt_amount'));
+        }
+
+        // Handle Nullable fields
+        if ($request->has('rcd_amount_nullable') && $request->input('rcd_amount_nullable') == 1) {
+            $query->whereNull('rcd_amount');
+        }
+
+        if ($request->has('bad_debt_amount_nullable') && $request->input('bad_debt_amount_nullable') == 1) {
+            $query->whereNull('bad_debt_amount');
+        }
+
+        if ($request->has('invoice_status')) {
+            if($request->input('invoice_status') == 'paid'){
+                $query->whereNotNulL('rcd_amount')
+                    ->orWhereNotNull('bad_debt_amount');
+            } elseif($request->input('invoice_status') == 'unpaid') {
+                $query->whereNull('rcd_amount')->whereNull('bad_debt_amount');
+            }
+        }
+
+        // Apply search if there's a search value
+        if (!empty($searchValue)) {
+            $query->whereHas('clients', function ($q) use ($searchValue) {
+                $q->where('name', 'like', "%$searchValue%")
+                    ->orWhere('ref_no', 'like', "%$searchValue%");
+            });
+        }
+
+        // Get the total filtered records count
+        $filteredRecords = $query->count();
+
+        // Apply pagination
+        $invoices = $query->offset($start)
+            ->limit($length)
+            ->get();
+
+//        dd($invoices);
+
+        $invoices = $invoices->map(function ($invoice) {
+            $rowClass = "text-center text-capitalize " . ($invoice->rcd_amount == null
+                    ? ($invoice->status == "bad_debts" ? 'bg-gradient-danger text-white' : 'bg-gradient-secondary text-white')
+                    : ($invoice->status == "bad_debts" ? 'bg-gradient-danger text-white' : 'bg-gradient-success text-white'));
+
+            return [
+                'id' => $invoice->id,
+                'ref_no' => $invoice->clients->ref_no,
+                'client_name' => $invoice->clients->name ?? '-',
+                'amount' => $invoice->amount,
+                'due_date' => $invoice->getFormattedDueDateAttribute(),
+                'invoice_year' => $invoice->invoice_year,
+                'rcd_amount' => $invoice->rcd_amount ?? 0,
+                'rcd_due_date' => $invoice->rcd_due_date ? $invoice->getFormattedRcdDueDateAttribute() : '-',
+                'time_gap' => $invoice->rcd_due_date ? round($invoice->time_gap()) : '-',
+                'bad_debt_amount' => $invoice->bad_debt_amount ?? 0,
+                'status' => $invoice->status ?? '-',
+                'payment_type' => $invoice->payment_type ?? '-',
+//                'notes' => $invoice->notes ?? '-',
+                'invoice_status' => ($invoice->rcd_amount != null || $invoice->bad_debt_amount != null) ? 'Paid' : 'Unpaid',
+                'row_class' => $rowClass,
+                'actions' => view('invoice.partials.actions', compact('invoice'))->render(),
+            ];
+        });
+        return response()->json([
+            'draw' => request('draw'),  // The draw counter from DataTables
+            'recordsTotal' => $totalRecords,  // Total records in the database
+            'recordsFiltered' => $filteredRecords,  // Total filtered records (adjust if you're filtering)
+            'data' => $invoices  // Data for the current page
+        ]);
+        /*return DataTables::of($invoices)
+            ->addColumn('client_name', function ($invoice) {
+                return $invoice->clients->name ?? '-';
+            })
+            ->addColumn('ref_no', function ($invoice) {
+                return $invoice->clients->ref_no ?? '-';
+            })
+            ->addColumn('due_date', function ($invoice) {
+                return $invoice->getFormattedDueDateAttribute();
+            })
+            ->addColumn('rcd_amount', function ($invoice) {
+                return $invoice->rcd_amount ?? '-';
+            })
+            ->addColumn('rcd_due_date', function ($invoice) {
+                return $invoice->getFormattedRcdDueDateAttribute();
+            })
+            ->addColumn('time_gap', function ($invoice) {
+                return round($invoice->time_gap()) ?? 0;
+            })
+            ->addColumn('status', function ($invoice) {
+                return $invoice->status ?? '-';
+            })
+            ->addColumn('payment_type', function ($invoice) {
+                return $invoice->payment_type ?? '-';
+            })
+//            ->addColumn('bad_debt_amount', function ($invoice) {
+//                return $invoice->clients->calculateBadDebts() ?? 0;
+//            })
+            ->addColumn('invoice_status', function ($invoice) {
+                return ($invoice->rcd_amount != null || $invoice->bad_debt_amount != null) ? 'Paid' : 'Unpaid';
+            })
+            ->addColumn('notes', function ($invoice) {
+                return $invoice->notes ?? '-';
+            })
+            ->addColumn('actions', function ($invoice) {
+                return view('invoice.partials.actions', compact('invoice'))->render();
+            })
+            ->rawColumns(['actions'])
+            ->make(true);*/
+    }
+
     public function fetchClients()
     {
         $clients = Client::get();
