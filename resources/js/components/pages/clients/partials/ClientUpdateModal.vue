@@ -13,7 +13,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <input type="hidden" class="form-control" id="client_id" v-model="formState.id" placeholder="e.g. 101">
-                                    <input type="number" class="form-control" id="ref_no" v-model="formState.ref_no" placeholder="e.g. 101">
+                                    <input type="text" class="form-control" id="ref_no" v-model="formState.ref_no" placeholder="e.g. 101">
                                     <span v-if="formState.errors.id" class="text-danger ps-2">{{ formState.errors.id }}</span>
                                     <span v-if="formState.errors.ref_no" class="text-danger ps-2">{{ formState.errors.ref_no }}</span>
                                 </div>
