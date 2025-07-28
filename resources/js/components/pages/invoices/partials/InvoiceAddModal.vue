@@ -23,7 +23,7 @@
                                     <!--                                    <input type="number" list="clientList" class="form-control form-control-sm" id="inv_clients_ref" placeholder="Client Ref No.">-->
                                     <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref">
                                         <option value="" disabled selected>Select client</option>
-                                        <option v-for="client in fetchClients"
+                                        <option v-for="client in fetchClientsChild"
                                                 :value="client.ref_no"
                                                 :data-ref="client.name"
                                                 :data-id="client.id">{{ client.ref_no }}</option>
@@ -115,11 +115,11 @@ import {ref} from "vue";
 const prop = defineProps(['addInvoiceModel', 'formState', 'clients'])
 const emit = defineEmits(['close', 'fetchInvoices'])
 
-const fetchClients = prop.clients;
+const fetchClientsChild = prop.clients;
 
 const inv_clients_ref = (e) => {
     const selectedRefNo = e.target.value;
-    const selectedClient = fetchClients.find(fetchClient => fetchClient.ref_no === selectedRefNo);
+    const selectedClient = fetchClientsChild.find(fetchClient => fetchClient.ref_no === selectedRefNo);
 
     if (selectedClient) {
         prop.formState.clients_id = selectedClient.id; // Set the selected client's ID

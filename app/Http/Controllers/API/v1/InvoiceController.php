@@ -18,25 +18,20 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->get('per_page', 10);
-        $invoices = Invoice::with('clients')->orderBy('updated_at','desc')->paginate($perPage);
+//        $perPage = $request->get('per_page', 10);
+        $invoices = Invoice::with('clients')->orderBy('updated_at','desc')->get();
         return response()->json($invoices);
     }
 
     public function getInvoices(Request $request)
     {
-//        dd($request->all());
-//        $invoices = Invoice::with('clients')->select('invoices.*'); // Use select for performance optimization
         $totalRecords = Invoice::count();
-//        dd($totalRecords);
 
         $start = $request->input('start'); // Offset
         $length = $request->input('length'); // Page size
         $draw = $request->input('draw'); // Draw counter for DataTables
         $searchValue = $request->input('search.value'); // Search value if applicable
 
-//        dd($length);
-        // Query to fetch the data
         $query = Invoice::with('clients');
 
         // Apply filters from the form
@@ -144,45 +139,6 @@ class InvoiceController extends Controller
             'recordsFiltered' => $filteredRecords,  // Total filtered records (adjust if you're filtering)
             'data' => $invoices  // Data for the current page
         ]);
-        /*return DataTables::of($invoices)
-            ->addColumn('client_name', function ($invoice) {
-                return $invoice->clients->name ?? '-';
-            })
-            ->addColumn('ref_no', function ($invoice) {
-                return $invoice->clients->ref_no ?? '-';
-            })
-            ->addColumn('due_date', function ($invoice) {
-                return $invoice->getFormattedDueDateAttribute();
-            })
-            ->addColumn('rcd_amount', function ($invoice) {
-                return $invoice->rcd_amount ?? '-';
-            })
-            ->addColumn('rcd_due_date', function ($invoice) {
-                return $invoice->getFormattedRcdDueDateAttribute();
-            })
-            ->addColumn('time_gap', function ($invoice) {
-                return round($invoice->time_gap()) ?? 0;
-            })
-            ->addColumn('status', function ($invoice) {
-                return $invoice->status ?? '-';
-            })
-            ->addColumn('payment_type', function ($invoice) {
-                return $invoice->payment_type ?? '-';
-            })
-//            ->addColumn('bad_debt_amount', function ($invoice) {
-//                return $invoice->clients->calculateBadDebts() ?? 0;
-//            })
-            ->addColumn('invoice_status', function ($invoice) {
-                return ($invoice->rcd_amount != null || $invoice->bad_debt_amount != null) ? 'Paid' : 'Unpaid';
-            })
-            ->addColumn('notes', function ($invoice) {
-                return $invoice->notes ?? '-';
-            })
-            ->addColumn('actions', function ($invoice) {
-                return view('invoice.partials.actions', compact('invoice'))->render();
-            })
-            ->rawColumns(['actions'])
-            ->make(true);*/
     }
 
     public function fetchClients()

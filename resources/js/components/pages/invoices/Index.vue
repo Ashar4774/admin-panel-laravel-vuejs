@@ -11,7 +11,7 @@
                         </div>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
-                        <form id="filterInvoiceForm" @submit.prevent="filterInvoiceForm" class="p-4">
+                        <form id="filterInvoiceForm" class="p-4">
                             <div class="row">
                                 <div class="col-md-2">
                                     <div class="form-group">
@@ -97,8 +97,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 d-flex gap-2 pt-4">
-                                    <button type="button" id="clearFilterBtn" class="btn bg-gradient-secondary w-100 h-50">Clear</button>
-                                    <button type="submit" id="submitFilterInvoiceBtn" class="btn bg-gradient-success w-100 h-50">Filter</button>
+                                    <button type="button" @click.prevent="clearFilterInvoiceForm" id="clearFilterBtn" class="btn bg-gradient-secondary w-100 h-50">Clear</button>
+                                    <button type="submit" @click.prevent="filterInvoiceForm" id="submitFilterInvoiceBtn" class="btn bg-gradient-success w-100 h-50">Filter</button>
                                 </div>
                             </div>
 
@@ -258,7 +258,7 @@ const deleteInvoiceModel = ref(false);
 const importInvoiceModel = ref(false);
 const updateInvoiceModel = ref(false);
 
-const formFilter = reactive({
+const initFormFilter = {
     filter_clients_ref: '',
     filter_clients_id: '',
     filter_client_name: '',
@@ -272,8 +272,8 @@ const formFilter = reactive({
     filter_bad_debt_amount: '',
     filter_null_bad_debt_amount: false,
     filter_status: '',
-
-});
+}
+const formFilter = reactive({ ...initFormFilter });
 
 const change_clients_list = (e) => {
     console.log(formFilter.filter_clients_ref);
@@ -293,7 +293,12 @@ const change_clients_list = (e) => {
 }
 
 const filterInvoiceForm = () => {
-    //
+    fetchDataTableInvoices(1);
+}
+
+const clearFilterInvoiceForm = () => {
+    Object.assign(formFilter, initFormFilter);
+    fetchDataTableInvoices(1);
 }
 
 const formState = reactive({
@@ -352,15 +357,15 @@ onMounted(() => {
     fetchInvoices();
 })
 
-const fetchInvoices = async (page) => {
-    await axios.get(`/api/invoices?page=${page}&per_page=${perPage.value}`)
+const fetchInvoices = async () => {
+    await axios.get(`/api/invoices`)
         .then(response=>{
             invoices.value = response.data.data;
-            pagination.value = reactive({
+            /*pagination.value = reactive({
                 current_page: response.data.current_page,
                 last_page: response.data.last_page,
                 total: response.data.total
-            });
+            });*/
         }).catch(error=>{
 
         })
@@ -414,19 +419,24 @@ const fetchDataTableInvoices = (page) => {
                 searchable: false,
                 orderable: false,
                 render: function(data, type, row) {
+                    const shouldAddClass = row.rcd_amount == null && row.bad_debt_amount == null;
+                    const viewBtnClass = shouldAddClass ? 'mx-2' : '';
                     return `
-                <a href="#" :class="( invoice.rcd_amount == null && invoice.bad_debt_amount == null ) ? 'mx-2' : '' " data-bs-toggle="tooltip" title="View Invoice">
-                <i class="fa-solid fa-eye text-white-50"></i>
-            </a>
-            <a v-if="invoice.rcd_amount == null && invoice.bad_debt_amount == null" href="#" class="" id="payInvoice" :data-id="invoice.id" data-bs-toggle="tooltip" title="Pay Invoice">
-                <i class="fa-solid fa-file-invoice text-white-50"></i>
-            </a>
-            <a href="#" class="mx-2" id="editInvoice" @click="updateInvoiceModelOpen(invoice.id)" :data-id="invoice.id" data-bs-toggle="tooltip" title="Edit Invoice">
-                <i class="fas fa-user-edit text-white-50"></i>
-            </a>
-            <span>
-                 <i class="cursor-pointer fas fa-trash text-white-50" id="deleteInvoice" @click="deleteInvoiceModelOpen(invoice.id)" :data-id="invoice.id" data-bs-toggle="tooltip" title="Delete Invoice"></i>
-            </span>
+                        <a href="#" :class="${viewBtnClass}" data-bs-toggle="tooltip" title="View Invoice">
+                            <i class="fa-solid fa-eye text-white-50"></i>
+                        </a>
+                        ${shouldAddClass ? `
+                        <a href="#" class="mx-2" id="payInvoice" data-id="${row.id}" data-bs-toggle="tooltip" title="Pay Invoice">
+                            <i class="fa-solid fa-file-invoice text-white-50"></i>
+                        </a>` : ''
+                        }
+                        <a href="#" class="mx-2 edit-invoice-btn" data-id="${row.id}" data-bs-toggle="tooltip" title="Edit Invoice">
+                            <i class="fas fa-user-edit text-white-50"></i>
+                        </a>
+
+                        <span>
+                            <i class="cursor-pointer fas fa-trash text-white-50 delete-invoice-btn" data-id="${row.id}" data-bs-toggle="tooltip" title="Delete Invoice"></i>
+                        </span>
             `;
                 }
             }
@@ -450,7 +460,12 @@ const fetchDataTableInvoices = (page) => {
             $('td', row).eq(14).addClass('text-center bg-white');
         },
         pageLength: 10,
-        lengthMenu: [10, 20, 50, 100]
+        lengthMenu: [10, 20, 50, 100],
+        responsive: true,
+        initComplete: function () {
+            $('#invoiceTable_wrapper div:first-child').addClass('flex-1');
+            $('#invoiceTable_wrapper > div:nth-child(3)').addClass('flex-1');
+        }
     })
 }
 
@@ -486,6 +501,12 @@ const addInvoiceModelClose = () => {
 // --------- End Add Invoice module ----------
 
 // --------- Update Invoice module ------------
+$(document).on('click', '.edit-invoice-btn', function (e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    updateInvoiceModelOpen(id);
+});
+
 const updateInvoiceModelOpen = (id) => {
     formState.id = id
     axios.get(`/api/invoices/${id}`)
@@ -522,6 +543,11 @@ const updateInvoiceModelClose = () => {
 
 // --------- Delete Invoice module -------------
 const invoice_alert = ref('');
+$(document).on('click', '.delete-invoice-btn', function (e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    deleteInvoiceModelOpen(id);
+});
 const deleteInvoiceModelOpen = (id) => {
     formState.id = id
     axios.get(`/api/invoices/${id}`)
