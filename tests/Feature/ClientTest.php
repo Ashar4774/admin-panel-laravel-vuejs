@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -17,25 +18,10 @@ class ClientTest extends TestCase
      */
     public function test_logged_in_user_can_create_a_client(): void
     {
-//        $user = User::factory()->create();
-//        $this->actingAs($user, 'sanctum');
-//        Client::factory()->hasInvoices(2)->count(5)->create();
-//
-//        $response = $this->getJson('/api/clients');
-//
-//        $response->assertStatus(200)
-//            ->assertOk()
-//            ->assertJsonStructure(['data']);
-
         // create user
         $user = User::factory()->create();
         // login
         $this->actingAs($user, 'sanctum');
-        /*$response = $this->post('/api/login',[
-            'email' => $user->email,
-            'password' => 'password'
-        ]);
-        $this->assertAuthenticated();*/
 
         // Client Create
         $client = $this->postJson(route('clients.store'),[
@@ -99,9 +85,9 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = $this->postJson(route('clients.store'),[
+        $storeClient = Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
-            'client_name' => 'Client Test1'
+            'name' => 'Client Test1'
         ]);
         $storeClient->assertStatus(201);
         // update client
@@ -141,9 +127,9 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = $this->postJson(route('clients.store'),[
+        $storeClient = Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
-            'client_name' => 'Client Test1'
+            'name' => 'Client Test1'
         ]);
         $storeClient->assertStatus(201);
 
@@ -153,15 +139,6 @@ class ClientTest extends TestCase
         $response = $this->deleteJson(route('clients.destroy', $client->id));
         $response->assertStatus(201);
     }
-    /*public function test_delete_a_client(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user, 'sanctum');
-        $client = Client::factory()->hasInvoices(2)->create();
-        $response = $this->deleteJson('/api/clients/{$client->id}');
-        $response->assertStatus(201)
-            ->assertJsonFragment(['message' => 'Client deleted successfully']);
-    }*/
 
     /**
      * importing clients test.
@@ -183,6 +160,36 @@ class ClientTest extends TestCase
     /**
      * State of account of client test.
      */
+    public function test_logged_in_user_can_view_state_of_account_of_user(){
+        // create user
+        $user = User::factory()->create();
+
+        // logged in user
+        $this->actingAs($user, 'sanctum');
+
+        // create Client
+        $client = Client::factory()->hasInvoices(2)->create([
+            'ref_no' => 'REFTEST001',
+            'name' => 'Client Test1'
+        ]);
+        $client->assertStatus(201);
+
+        $clientData = Client::first();
+
+        // create invoices against that client
+        /*$invoice = Invoice::factory()->count(3)->create([
+           'clients_id' => $clientData->id
+        ]);*/
+//        $invoice->assertStatus(201);
+
+        // show invoice by hitting route clients/stateOfAccount/id
+        $stateResponse = $this->getJson(route('clients.state_of_account', $clientData->id));
+        $stateResponse->assertStatus(200);
+        $stateResponse->assertJsonStructure([
+            'client'
+        ]);
+
+    }
     /*public function test_return_state_of_account(): void
     {
         $user = User::factory()->create();

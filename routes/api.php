@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('checkAuthStatus', [AuthController::class, 'checkAuthStatus'])->name('checkAuthStatus');
 //    Route::post('clients/store', [ClientController::class, 'store']);
     Route::post('clients/import', [ClientController::class, 'import']);
-    Route::get('clients/state_of_account/{id}', [ClientController::class, 'state_of_account']);
+    Route::get('clients/state_of_account/{id}', [ClientController::class, 'state_of_account'])->name('clients.state_of_account');
     Route::apiResource('clients', ClientController::class);
 
     Route::get('invoices/getInvoices', [InvoiceController::class, 'getInvoices'])->name('getInvoices');
