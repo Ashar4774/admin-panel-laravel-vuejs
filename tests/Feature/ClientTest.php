@@ -42,7 +42,7 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $client = Client::factory()->hasInvoices(2)->create([
+        Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
             'name' => 'Client Test1'
         ]);
@@ -62,7 +62,7 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = Client::factory()->hasInvoices(2)->create([
+        Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
             'name' => 'Client Test1'
         ]);
@@ -85,11 +85,10 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = Client::factory()->hasInvoices(2)->create([
+        Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
             'name' => 'Client Test1'
         ]);
-        $storeClient->assertStatus(201);
         // update client
         $client = Client::first();
         $response = $this->putJson(route('clients.update', $client->id), [
@@ -104,19 +103,6 @@ class ClientTest extends TestCase
         $response->assertStatus(201);
 
     }
-    /*public function test_update_a_client(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user, 'sanctum');
-        $client = Client::factory()->hasInvoices(2)->create();
-        $response = $this->putJson('/api/clients/{$client->id}', [
-            'ref_no' => 'REFNEW',
-            'name' => 'Updated Test Name'
-        ]);
-
-        $response->assertStatus(201)
-            ->assertJsonFragment(['message' => 'Client Updated Successfully']);
-    }*/
 
     /**
      * deleting client.
@@ -127,11 +113,10 @@ class ClientTest extends TestCase
         // login user with sanctum
         $this->actingAs($user, 'sanctum');
         // create client
-        $storeClient = Client::factory()->hasInvoices(2)->create([
+        Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
             'name' => 'Client Test1'
         ]);
-        $storeClient->assertStatus(201);
 
         // delete client data
         $client = Client::first();
@@ -143,19 +128,18 @@ class ClientTest extends TestCase
     /**
      * importing clients test.
      */
-    /*public function test_import_clients_from_excel(): void
+    public function test_logged_in_user_can_import_clients_from_excel(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
         $file = UploadedFile::fake()->create('clients.xlsx');
 
-        $response = $this->postJson('/api/clients/import', [
+        $response = $this->postJson(route('clients.import'), [
             'client_file' => $file
         ]);
 
-        $response->assertOk()
-            ->assertJsonFragment(['message' => 'Client data imported successfully']);
-    }*/
+        $response->assertStatus(200);
+    }
 
     /**
      * State of account of client test.
@@ -168,19 +152,12 @@ class ClientTest extends TestCase
         $this->actingAs($user, 'sanctum');
 
         // create Client
-        $client = Client::factory()->hasInvoices(2)->create([
+        Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
             'name' => 'Client Test1'
         ]);
-        $client->assertStatus(201);
 
         $clientData = Client::first();
-
-        // create invoices against that client
-        /*$invoice = Invoice::factory()->count(3)->create([
-           'clients_id' => $clientData->id
-        ]);*/
-//        $invoice->assertStatus(201);
 
         // show invoice by hitting route clients/stateOfAccount/id
         $stateResponse = $this->getJson(route('clients.state_of_account', $clientData->id));
@@ -190,14 +167,5 @@ class ClientTest extends TestCase
         ]);
 
     }
-    /*public function test_return_state_of_account(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user, 'sanctum');
-        $client = Client::factory()->hasInvoices(2)->create();
 
-        $response = $this->getJson('/api/clients/state_of_account/{$client->id}');
-        $response->assertOk()
-            ->assertJsonFragment(['client' => ['id' => $client->id]]);
-    }*/
 }
