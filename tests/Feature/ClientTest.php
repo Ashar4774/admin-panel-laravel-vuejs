@@ -18,10 +18,7 @@ class ClientTest extends TestCase
      */
     public function test_logged_in_user_can_create_a_client(): void
     {
-        // create user
-        $user = User::factory()->create();
-        // login
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
 
         // Client Create
         $client = $this->postJson(route('clients.store'),[
@@ -37,10 +34,8 @@ class ClientTest extends TestCase
      * show clients list test.
      */
     public function test_logged_in_user_can_view_clients_list(){
-        // create user
-        $user = User::factory()->create();
-        // login user with sanctum
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
+
         // create client
         Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
@@ -57,10 +52,8 @@ class ClientTest extends TestCase
      * showing client test.
      */
     public function test_logged_in_user_can_show_the_client_with_specific_id(){
-        // create user
-        $user = User::factory()->create();
-        // login user with sanctum
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
+
         // create client
         Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
@@ -80,10 +73,7 @@ class ClientTest extends TestCase
      * updating client test.
      */
     public function test_logged_in_user_can_update_the_client(){
-        // create user
-        $user = User::factory()->create();
-        // login user with sanctum
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
         // create client
         Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
@@ -108,10 +98,7 @@ class ClientTest extends TestCase
      * deleting client.
      */
     public function test_logged_in_user_can_delete_the_client(){
-        // create user
-        $user = User::factory()->create();
-        // login user with sanctum
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
         // create client
         Client::factory()->hasInvoices(2)->create([
             'ref_no' => 'REFTEST001',
@@ -130,8 +117,7 @@ class ClientTest extends TestCase
      */
     public function test_logged_in_user_can_import_clients_from_excel(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
         $file = UploadedFile::fake()->create('clients.xlsx');
 
         $response = $this->postJson(route('clients.import'), [
@@ -145,11 +131,7 @@ class ClientTest extends TestCase
      * State of account of client test.
      */
     public function test_logged_in_user_can_view_state_of_account_of_user(){
-        // create user
-        $user = User::factory()->create();
-
-        // logged in user
-        $this->actingAs($user, 'sanctum');
+        $this->setUpLogin();
 
         // create Client
         Client::factory()->hasInvoices(2)->create([

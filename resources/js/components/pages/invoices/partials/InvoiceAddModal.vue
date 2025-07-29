@@ -24,6 +24,7 @@
                                     <select id="clientList" class="form-control form-control-sm" @change="inv_clients_ref">
                                         <option value="" disabled selected>Select client</option>
                                         <option v-for="client in fetchClientsChild"
+                                                :key="client.id"
                                                 :value="client.ref_no"
                                                 :data-ref="client.name"
                                                 :data-id="client.id">{{ client.ref_no }}</option>
