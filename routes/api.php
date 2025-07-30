@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('invoices/getInvoices', [InvoiceController::class, 'getInvoices'])->name('getInvoices');
     Route::get('invoices/fetchClients', [InvoiceController::class, 'fetchClients'])->name('fetchClients');
-    Route::post('invoices/import', [InvoiceController::class, 'import']);
+    Route::post('invoices/import', [InvoiceController::class, 'import'])->name('invoices.import');
     Route::apiResource('invoices', InvoiceController::class);
 
     Route::get('/state_of_account/show/{ref_no}', [StateOfAccountController::class, 'show']);
