@@ -31,10 +31,10 @@
                                         </div>
                                     </div>
                                     <div class="card-body pt-0 p-3 text-center">
-                                        <h6 class="text-center mb-0">Total Payment</h6>
+                                        <h6 class="text-center mb-0 text-sm font-weight-bold">Total Payment</h6>
                                         <hr class="horizontal dark my-3">
 <!--                                        <h5 class="mb-0">$0</h5>-->
-                                        <h5 class="mb-0">${{ client.payment }}</h5>
+                                        <h5 class="mb-0">${{ (client.payment).toFixed(2) }}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -46,9 +46,9 @@
                                         </div>
                                     </div>
                                     <div class="card-body pt-0 p-3 text-center">
-                                        <h6 class="text-center mb-0">Arrears</h6>
+                                        <h6 class="text-center mb-0 text-sm font-weight-bold">Arrears</h6>
                                         <hr class="horizontal dark my-3">
-                                        <h5 class="mb-0">${{ ( client.arrears - client.bad_debt ) }}</h5>
+                                        <h5 class="mb-0">${{ ( client.arrears - client.bad_debt ).toFixed(2) }}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -60,9 +60,9 @@
                                         </div>
                                     </div>
                                     <div class="card-body pt-0 p-3 text-center">
-                                        <h6 class="text-center mb-0">Bad Debts</h6>
+                                        <h6 class="text-center mb-0 text-sm font-weight-bold">Bad Debts</h6>
                                         <hr class="horizontal dark my-3">
-                                        <h5 class="mb-0">${{ client.bad_debt }}</h5>
+                                        <h5 class="mb-0">${{ (client.bad_debt).toFixed(2) }}</h5>
                                     </div>
                                 </div>
                             </div>

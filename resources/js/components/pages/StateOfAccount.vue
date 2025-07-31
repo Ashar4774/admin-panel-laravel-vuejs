@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid py-4">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-8">
                 <div class="row">
                     <div class="col-12">
                         <div class="card mb-4 mx-4" id="state_of_account_card">
@@ -12,18 +12,17 @@
                                         <span class="mb-2 text-xs d-flex">Client Ref:
                                             <span class="text-dark font-weight-bold ms-sm-2">
                                                 <form action="">
-                                                    <input list="clientList" type="number" id="search_client_id" @change="search_client_id" class="form-control-sm" placeholder="Enter client ref #" autocomplete="off">
+                                                    <input list="clientList" type="text" id="search_client_id" @change="search_client_id" class="form-control-sm" placeholder="Enter client ref #" autocomplete="off">
                                                     <datalist id="clientList" >
                                                             <option v-for="client in clients" :value="client.ref_no">{{ client.ref_no }}</option>
                                                     </datalist>
                                                 </form>
                                             </span>
                                         </span>
-                                        <span class="d-flex flex-row gap-12">
+                                        <span class="d-flex flex-row">
                                             <span class="d-flex flex-column">
                                                 <span class="mb-2 text-xs">Client Name: <span class="text-dark ms-sm-2 font-weight-bold" id="soa_client_name">{{ client ? client.name : 'Client Name' }}</span></span>
-                                                <span class="text-xs">Date: <span class="text-dark ms-sm-2 font-weight-bold"> dd/mm/yy </span></span>
-                                                <!--                                                <span class="text-xs">Date: <span class="text-dark ms-sm-2 font-weight-bold">{{ \Carbon\Carbon::now()->format('d/m/y') }}</span></span>-->
+                                                <span class="text-xs">Date: <span class="text-dark ms-sm-2 font-weight-bold">{{ formattedDate }}</span></span>
                                             </span>
                                             <span class="">
                                                 <button id="downloadPDF" class="btn btn-link mb-0" @click="downloadPDF" v-if="client?.invoices?.length > 0">Download PDF</button>
@@ -78,7 +77,7 @@
                                             <!-- Balance outstanding row -->
                                             <tr class="bg-warning text-white">
                                                 <td colspan="2" class="ps-4">Balance outstanding now</td>
-                                                <td>{{ client.arrears - client.bad_debt || 0 }}</td>
+                                                <td>{{ (client.arrears - client.bad_debt) || 0 }}</td>
                                             </tr>
 
                                             <!-- Bad debts row -->
@@ -111,6 +110,7 @@
 <script setup>
 import {onMounted, ref} from 'vue';
 import axios from "@/axios.js";
+const formattedDate = ref('')
 
 const clients = ref([]);
 const client = ref([]);
@@ -126,6 +126,13 @@ const fetchClients = async () => {
 onMounted(()=>{
     fetchClients();
     formatDueDate();
+
+    const now = new Date()
+    const day = String(now.getDate()).padStart(2, '0')
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const year = String(now.getFullYear()).slice(-2)
+
+    formattedDate.value = `${day}/${month}/${year}`
 })
 
 const search_client_id = async (e) => {
