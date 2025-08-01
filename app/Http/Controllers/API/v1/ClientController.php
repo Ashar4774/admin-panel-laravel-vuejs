@@ -32,6 +32,59 @@ class ClientController extends Controller
         return response()->json($clients);
     }
 
+    public function getClients(Request $request)
+    {
+//        $invoices = Invoice::with('clients')->select('invoices.*'); // Use select for performance optimization
+        $totalRecords = Client::count();
+
+        $start = $request->input('start'); // Offset
+        $length = $request->input('length'); // Page size
+        $draw = $request->input('draw'); // Draw counter for DataTables
+        $searchValue = $request->input('search.value'); // Search value if applicable
+
+        // Query to fetch the data
+        /*$query = Client::with('invoices')->get()->map(function ($client) {
+            $client->arrears = $client->calculateArrears();
+            $client->bad_debts = $client->calculateBadDebts();
+            return $client;
+        });*/
+        $query = Client::with('invoices');
+
+        // Apply search if there's a search value
+        if (!empty($searchValue)) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('name', 'like', "%{$searchValue}%")
+                    ->orWhere('ref_no', 'like', "%{$searchValue}%");
+            });
+        }
+
+        // Get the total filtered records count
+        $filteredRecords = $query->count();
+
+        // Apply pagination
+        $clients = $query->offset($start)->limit($length)->get()->map(function ($client) {
+            $client->arrears = $client->calculateArrears();
+            $client->bad_debts = $client->calculateBadDebts();
+            return $client;
+        });
+
+        $clients = $clients->map(function ($client) {
+
+            return [
+                'ref_no' => $client->ref_no,
+                'client_name' => $client->name ?? '-',
+                'arrears' => ( $client->arrears - $client->bad_debts) ? number_format(( $client->arrears - $client->bad_debts), 2) : 0,
+                'bad_debts' => $client->bad_debts ? number_format($client->bad_debts, 2) : 0,
+            ];
+        });
+        return response()->json([
+            'draw' => request('draw'),  // The draw counter from DataTables
+            'recordsTotal' => $totalRecords,  // Total records in the database
+            'recordsFiltered' => $filteredRecords,  // Total filtered records (adjust if you're filtering)
+            'data' => $clients  // Data for the current page
+        ]);
+    }
+
     public function import(ClientImportRequest $request)
     {
         try {

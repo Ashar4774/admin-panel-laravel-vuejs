@@ -13,15 +13,13 @@
                                 <div class="d-flex flex-column flex-md-row justify-content-between">
                                     <div class="d-flex flex-column">
                                         <h5 class="mb-3 ">State of Account</h5>
-                                        <span class="d-flex flex-row gap-12">
+                                        <span class="d-flex flex-row">
                                             <span class="d-flex flex-column">
                                                 <span class="mb-2 text-xs">Client Ref No: <span class="text-dark ms-sm-2 font-weight-bold" id="soa_client_name">{{ client.ref_no ?? '001' }}</span></span>
                                                 <span class="mb-2 text-xs">Client Name: <span class="text-dark ms-sm-2 font-weight-bold" id="soa_client_name">{{ client.name ?? 'Client Name' }}</span></span>
-                                                <span class="text-xs">Date: <span class="text-dark ms-sm-2 font-weight-bold"> dd/mm/yy </span></span>
-                                                <!--                                                <span class="text-xs">Date: <span class="text-dark ms-sm-2 font-weight-bold">{{ \Carbon\Carbon::now()->format('d/m/y') }}</span></span>-->
+                                                <span class="text-xs">Date: <span class="text-dark ms-sm-2 font-weight-bold">{{ formattedDate }}</span></span>
                                             </span>
                                             <span class="">
-<!--                                                <button id="downloadPDF" class="btn btn-link mb-0" >Download PDF</button>-->
                                                 <button id="downloadPDF" class="btn btn-link mb-0" @click="downloadPDF" v-if="client?.invoices?.length > 0">Download PDF</button>
                                             </span>
                                         </span>
@@ -108,6 +106,7 @@
     import {onMounted, ref} from "vue";
 
     const prop = defineProps(['id']);
+    const formattedDate = ref('')
 
     const client = ref([]);
 
@@ -133,6 +132,13 @@
     onMounted(()=>{
         fetchUserDetail();
         formatDueDate();
+
+        const now = new Date()
+        const day = String(now.getDate()).padStart(2, '0')
+        const month = String(now.getMonth() + 1).padStart(2, '0')
+        const year = String(now.getFullYear()).slice(-2)
+
+        formattedDate.value = `${day}/${month}/${year}`
     })
 
     const downloadPDF = () => {

@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/dashboard/getInfo', [DashboardController::class, 'index']);
     Route::get('checkAuthStatus', [AuthController::class, 'checkAuthStatus'])->name('checkAuthStatus');
 //    Route::post('clients/store', [ClientController::class, 'store']);
+    Route::get('clients/getClients', [ClientController::class, 'getClients'])->name('getClients');
     Route::post('clients/import', [ClientController::class, 'import'])->name('clients.import');
     Route::get('clients/state_of_account/{id}', [ClientController::class, 'state_of_account'])->name('clients.state_of_account');
     Route::apiResource('clients', ClientController::class);

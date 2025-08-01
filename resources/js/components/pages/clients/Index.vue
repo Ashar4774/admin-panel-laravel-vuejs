@@ -16,7 +16,7 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0" id="clientTable">
+                            <table class="table align-items-center mb-0 " id="clientTable">
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -38,12 +38,12 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+<!--                                <tbody>
                                     <FetchClients :clients="clients" :editClient="editClient" :deleteClient="deleteClient"/>
-                                </tbody>
+                                </tbody>-->
                             </table>
                         </div>
-                        <div class="d-flex flex-row justify-content-between">
+<!--                        <div class="d-flex flex-row justify-content-between">
                             <div class="d-flex justify-content-start align-items-center px-3 mb-2">
                                 <label for="perPage" class="me-2 mb-0">Show:</label>
                                 <select id="perPage" v-model="perPage" @change="changePerPage" class="form-select form-select-sm w-auto">
@@ -71,7 +71,7 @@
                                     Next
                                 </button>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
@@ -105,6 +105,8 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
     import ClientUpdateModal from "@/components/pages/clients/partials/ClientUpdateModal.vue";
     import ClientDeleteModal from "@/components/pages/clients/partials/ClientDeleteModal.vue";
     import ClientImportModal from "@/components/pages/clients/partials/ClientImportModal.vue";
+    import 'datatables.net';
+    import 'datatables.net-bs5';
 
     const clients = ref([]);
     const pagination = ref({
@@ -130,18 +132,84 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
             })
     }
 
+const fetchDataTableClients = (page) => {
+    $('#clientTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: `/api/clients/getClients?page=${page}&per_page=${perPage.value}`,
+            type: 'GET',
+            data: function (d) {
+                return d;
+            },
+            beforeSend: function (xhr) {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                }
+            }
+        },
+        columns: [
+            { data: 'ref_no', name: 'ref_no' }, // Matches 'ref_no' key
+            { data: 'client_name', name: 'client_name' }, // Matches 'client_name' key
+            { data: 'arrears', name: 'arrears' }, // Matches 'arrears' key
+            { data: 'bad_debts', name: 'bad_debts' }, // Matches 'bad_debts' key
+            {
+                data: 'actions', // Matches 'actions' key
+                searchable: false,
+                orderable: false,
+                render: function(data, type, row) {
+
+                    return `
+                        <a href="{{ route('client.show', ${row.id}) }}" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="View User">
+                            <i class="fa-solid fa-eye text-secondary"></i>
+                        </a>
+                        <a href="{{ route('client.state_of_account', ${row.id}) }}" class="" data-bs-toggle="tooltip" data-bs-original-title="State of Account">
+                            <i class="fa-solid fa-file-invoice text-secondary"></i>
+                        </a>
+                        <a href="#" class="mx-3 edit-client-btn" id="editClient" data-bs-toggle="tooltip" data-bs-original-title="Edit User" data-id="{{ $client->id  }}">
+                            <i class="fas fa-user-edit text-secondary"></i>
+                        </a>
+                        <span>
+                              <i class="cursor-pointer fas fa-trash text-secondary delete-client-btn" id="deleteClient" data-bs-toggle="tooltip" data-bs-original-title="Delete User" data-id="{{ $client->id  }}"></i>
+                        </span>
+            `;
+                }
+            }
+        ],
+        createdRow: function (row, data, dataIndex){
+            $('td', row).eq(0).addClass('ps-4');
+            $('td', row).eq(2).addClass('text-success');
+            $('td', row).eq(3).addClass('text-danger');
+            $('td', row).eq(4).addClass('text-center');
+        },
+        pageLength: 10,
+        lengthMenu: [10, 20, 40, 80],
+        responsive: true,
+        initComplete: function () {
+            $('#clientTable_wrapper').addClass('flex flex-column');
+            $('#clientTable_wrapper div:first-child').addClass('flex-1');
+            $('#clientTable_wrapper > div:nth-child(3)').addClass('flex-1');
+        }
+
+    });
+}
+
     const changePage = (page) => {
         if(page !== pagination.value.current_page){
             fetchClients(page);
+            fetchDataTableClients(page);
         }
     }
 
     const changePerPage = () => {
         fetchClients(1);
+        fetchDataTableClients(1)
     }
 
     onMounted(()=>{
         fetchClients();
+        fetchDataTableClients(1);
     });
 
     const formState = reactive({
@@ -171,6 +239,11 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
     // --------------End Add client module---------
 
     // --------------Update client module-----------
+    $(document).on('click', '.edit-client-btn', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        // updateInvoiceModelOpen(id);
+    });
     const editClient = async (id) => {
         await axios.get(`/api/clients/${id}`)
             .then(response=>{
@@ -200,6 +273,11 @@ import {ref, reactive, onMounted, nextTick} from 'vue';
     // ---------------Delete client module---------------
 
     const client_alert = ref('');
+    $(document).on('click', '.delete-invoice-btn', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        // deleteInvoiceModelOpen(id);
+    });
     const deleteClient = async (id) => {
         formState.id = id;
         await axios.get(`/api/clients/${id}`)
