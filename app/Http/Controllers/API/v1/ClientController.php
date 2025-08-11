@@ -18,6 +18,7 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('view', Client::class);
         $perPage = $request->get('per_page');
         $clients = Client::with('invoices')
             ->orderBy('updated_at', 'desc')
@@ -71,6 +72,7 @@ class ClientController extends Controller
         $clients = $clients->map(function ($client) {
 
             return [
+                'id' => $client->id,
                 'ref_no' => $client->ref_no,
                 'client_name' => $client->name ?? '-',
                 'arrears' => ( $client->arrears - $client->bad_debts) ? number_format(( $client->arrears - $client->bad_debts), 2) : 0,
@@ -88,6 +90,7 @@ class ClientController extends Controller
     public function import(ClientImportRequest $request)
     {
         try {
+            $this->authorize('import', Client::class);
             Excel::import(new CLientDetailImport, $request->file('client_file'));
 
             return response()->json([
@@ -141,6 +144,7 @@ class ClientController extends Controller
     public function store(ClientRequest $request)
     {
         try {
+            $this->authorize('create', Client::class);
             $client = Client::create([
                 'ref_no' => $request['ref_no'],
                 'name' => $request['client_name']

@@ -161,10 +161,10 @@ const fetchDataTableClients = (page) => {
                 render: function(data, type, row) {
 
                     return `
-                        <a href="{{ route('client.show', ${row.id}) }}" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="View User">
+                        <a href="/client/${row.id}" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="View User">
                             <i class="fa-solid fa-eye text-secondary"></i>
                         </a>
-                        <a href="{{ route('client.state_of_account', ${row.id}) }}" class="" data-bs-toggle="tooltip" data-bs-original-title="State of Account">
+                        <a href="/client/state_of_account/${row.id}" class="" data-bs-toggle="tooltip" data-bs-original-title="State of Account">
                             <i class="fa-solid fa-file-invoice text-secondary"></i>
                         </a>
                         <a href="#" class="mx-3 edit-client-btn" id="editClient" data-bs-toggle="tooltip" data-bs-original-title="Edit User" data-id="{{ $client->id  }}">

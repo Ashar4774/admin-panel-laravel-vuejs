@@ -6,7 +6,7 @@ export default createStore({
         token: localStorage.getItem('token') || '',
         isAuthenticated: false,
         isSidebarVisible: '',
-        breadcrum: ''
+        breadcrum: 'dashboard'
     },
 
     mutations: {
@@ -30,6 +30,8 @@ export default createStore({
         logoutUser(state){
             state.token = null
             state.isAuthenticated = false
+            console.log(state.token)
+            console.log(state.isAuthenticated)
         },
 
     //     Toggle menu button
