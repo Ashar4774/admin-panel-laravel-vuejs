@@ -19,7 +19,7 @@ class RolePermissionSeeder extends Seeder
         $roles = ['admin', 'staff'];
 
         $permissions = [
-            'view-client', 'create-client', 'update-client', 'delete-client', 'import-client',
+            'view-client', 'create-client', 'state-of-account-client', 'update-client', 'delete-client', 'import-client',
             'view-invoice', 'create-invoice', 'update-invoice', 'delete-invoice', 'import-invoice',
             'view-state-of-account', 'export-state-of-account'
         ];

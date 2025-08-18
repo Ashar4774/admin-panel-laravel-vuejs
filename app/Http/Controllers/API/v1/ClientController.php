@@ -35,6 +35,7 @@ class ClientController extends Controller
 
     public function getClients(Request $request)
     {
+        $this->authorize('view', Client::class);
 //        $invoices = Invoice::with('clients')->select('invoices.*'); // Use select for performance optimization
         $totalRecords = Client::count();
 
@@ -44,11 +45,6 @@ class ClientController extends Controller
         $searchValue = $request->input('search.value'); // Search value if applicable
 
         // Query to fetch the data
-        /*$query = Client::with('invoices')->get()->map(function ($client) {
-            $client->arrears = $client->calculateArrears();
-            $client->bad_debts = $client->calculateBadDebts();
-            return $client;
-        });*/
         $query = Client::with('invoices');
 
         // Apply search if there's a search value

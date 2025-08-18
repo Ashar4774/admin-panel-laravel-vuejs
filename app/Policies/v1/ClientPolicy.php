@@ -23,6 +23,10 @@ class ClientPolicy
         return $user->hasPermission('create-client');
     }
 
+    public function state_of_account(User $user){
+        return $user->hasPermission('state-of-account-client');
+    }
+
     public function update(User $user, Client $client){
         return $user->hasPermission('update-client');
     }

@@ -9,6 +9,8 @@ import ClientIndex from '../components/pages/clients/Index.vue';
 import ClientShow from '../components/pages/clients/Show.vue';
 import ClientStateOfAccount from '../components/pages/clients/StateOfAccount.vue';
 import InvoiceIndex from '../components/pages/invoices/Index.vue';
+import RoleIndex from '../components/pages/roles/Index.vue';
+import permissionIndex from '../components/pages/permissions/Index.vue';
 import UserProfile from '../components/pages/UserProfile.vue';
 
 const routes = [
@@ -71,6 +73,24 @@ const routes = [
         path: '/state_of_account',
         name: 'state_of_account',
         component: StateOfAccount,
+        meta: {
+            layout: 'PanelLayout',
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/roles',
+        name: 'roles',
+        component: RoleIndex,
+        meta: {
+            layout: 'PanelLayout',
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/permissions',
+        name: 'permissions',
+        component: permissionIndex,
         meta: {
             layout: 'PanelLayout',
             requiresAuth: true
