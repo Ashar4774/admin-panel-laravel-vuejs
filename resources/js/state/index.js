@@ -6,7 +6,9 @@ export default createStore({
         token: localStorage.getItem('token') || '',
         isAuthenticated: false,
         isSidebarVisible: '',
-        breadcrum: 'dashboard'
+        breadcrum: 'dashboard',
+        roles: [],
+        permissions: []
     },
 
     mutations: {
@@ -28,10 +30,11 @@ export default createStore({
         },
 
         logoutUser(state){
-            state.token = null
-            state.isAuthenticated = false
-            console.log(state.token)
-            console.log(state.isAuthenticated)
+            state.token = null;
+            state.isAuthenticated = false;
+            state.user = null;
+            state.roles = [];
+            state.permissions = [];
         },
 
     //     Toggle menu button
@@ -46,7 +49,14 @@ export default createStore({
     //     change Breadcrum
         setBreadcrum(state, value){
             state.breadcrum = value
-        }
+        },
+
+    //     check role and permissions
+        setUserData(state, {user, roles, permissions}){
+            state.user =  user;
+            state.roles = roles;
+            state.permissions = permissions;
+        },
     },
 
     actions: {
@@ -56,6 +66,20 @@ export default createStore({
 
         setAuthToken( {commit}, token ){
             commit('updateAuthToken', token)
+        },
+
+        async fetchUserData({commit}){
+            try{
+                const res = await axios.get('api/me');
+                commit('setUserData', {
+                    user: res.data.user,
+                    roles: res.data.roles,
+                    permissions: res.data.permissions
+                });
+                commit('updateAuthStatus', true);
+            }catch(error){
+                commit('updateAuthStatus', false);
+            }
         },
 
         checkUserAuthentication({commit}){
@@ -92,6 +116,11 @@ export default createStore({
 
     getters: {
         authToken: state => state.token,
-        authStatus: state => state.isAuthenticated
+        authStatus: state => state.isAuthenticated,
+        user: state => state.user,
+        roles: state => state.roles,
+        permissions: state => state.permissions,
+        can: state => (perm) => state.permissions.includes(perm),
+        hasRole: state => (role) => state.roles.includes(role)
     }
 })

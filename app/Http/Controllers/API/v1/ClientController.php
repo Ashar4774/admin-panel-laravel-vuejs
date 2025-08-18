@@ -205,6 +205,7 @@ class ClientController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $this->authorize('update', Client::class);
             $client= Client::findOrFail($id);
             $client->update([
                 'ref_no' => $request['ref_no'],
@@ -229,6 +230,7 @@ class ClientController extends Controller
     public function destroy($id)
     {
         try {
+            $this->authorize('delete', Client::class);
             $client = Client::findOrFail($id);
             $client->delete();
 

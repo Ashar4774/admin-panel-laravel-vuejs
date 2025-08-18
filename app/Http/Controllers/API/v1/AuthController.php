@@ -12,6 +12,22 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    function me(Request $request){
+        $user = $request->user();
+
+        return response()->json([
+            'user' => $user,
+            'roles' => $user->roles->pluck('name'),
+            'permissions' => $user->roles()
+                            ->with('permissions')
+                            ->get()
+                            ->pluck('permissions.*.name')
+                            ->flatten()
+                            ->unique()
+                            ->values()
+        ]);
+    }
+
     function login(LoginRequest $request){
         try {
             $user = User::where('email', $request->email)->first();

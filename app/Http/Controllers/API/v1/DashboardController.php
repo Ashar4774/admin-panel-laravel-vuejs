@@ -47,7 +47,7 @@ class DashboardController extends Controller
 
     public function user_profile(){
         try {
-            $auth = Auth::user();
+            $auth = Auth::user()->load('roles.permissions');
             return response()->json([
                'auth' => $auth,
             ], 201);

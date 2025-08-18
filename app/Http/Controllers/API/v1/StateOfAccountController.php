@@ -38,6 +38,7 @@ class StateOfAccountController extends Controller
     public function show($ref_no)
     {
         try{
+            $this->authorize('view', StateOfAccount::class);
             $client = Client::with('invoices')->where('ref_no', 'LIKE', "%{$ref_no}%")->first();
             $html = '';
             if ($client) {

@@ -30,7 +30,7 @@
                 <span class="nav-link-text ms-1">Dashboard</span>
             </router-link>
         </li>
-        <li class="nav-item">
+        <li v-if="hasRole('admin') || can('view-client')" class="nav-item">
             <router-link class="nav-link" :to="{name: 'client'}" @click.native="updateBreadcrum('client')">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -84,6 +84,14 @@
     import store from '@/state/index.js';
     import axios from "axios";
 
+    // code for permission
+    const fetchUserData = () => {
+        store.dispatch('fetchUserData');
+    }
+
+    const can = (perm) => store.getters.can(perm);
+    const hasRole = (role) => store.getters.hasRole(role);
+
     const updateBreadcrum = (breadcrum) => {
         store.dispatch('setBreadcrum', breadcrum);
     }
@@ -116,5 +124,6 @@
 
     onMounted(()=>{
         fetchAuth();
+        fetchUserData();
     })
 </script>

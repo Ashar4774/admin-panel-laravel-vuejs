@@ -17,6 +17,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 //Route::apiResource('clients', ClientController::class);
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('/dashboard/getInfo', [DashboardController::class, 'index']);
+    Route::get('me', [AuthController::class, 'me'])->name('me');
     Route::get('checkAuthStatus', [AuthController::class, 'checkAuthStatus'])->name('checkAuthStatus');
 //    Route::post('clients/store', [ClientController::class, 'store']);
     Route::get('clients/getClients', [ClientController::class, 'getClients'])->name('getClients');

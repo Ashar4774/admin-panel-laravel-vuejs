@@ -18,6 +18,7 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('view', Invoice::class);
 //        $perPage = $request->get('per_page', 10);
         $invoices = Invoice::with('clients')->orderBy('updated_at','desc')->get();
         return response()->json($invoices);
@@ -149,6 +150,7 @@ class InvoiceController extends Controller
 
     public function import(InvoiceImportRequest $request){
         try {
+            $this->authorize('import', Invoice::class);
             Excel::import(new InvoiceDetailImport, $request->file('invoice_file'));
 
             return response()->json([
@@ -176,6 +178,7 @@ class InvoiceController extends Controller
     public function store(InvoiceRequest $request)
     {
         try{
+            $this->authorize('create', Invoice::class);
             $invoice = Invoice::create([
                 'clients_id' => $request['clients_id'],
                 'amount' => $request['amount'],
@@ -235,6 +238,7 @@ class InvoiceController extends Controller
     public function update(InvoiceRequest $request, $id)
     {
         try {
+            $this->authorize('update', Invoice::class);
             $invoice = Invoice::findOrFail($id);
             $invoice->update([
                 'clients_id' => $request['clients_id'],
@@ -267,6 +271,7 @@ class InvoiceController extends Controller
     public function destroy($id)
     {
         try {
+            $this->authorize('delete', Invoice::class);
             $invoice = Invoice::findOrFail($id);
             $invoice->delete();
             return response()->json([
