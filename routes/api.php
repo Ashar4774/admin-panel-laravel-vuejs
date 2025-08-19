@@ -7,6 +7,7 @@ use App\Http\Controllers\API\v1\ClientController;
 use App\Http\Controllers\API\v1\InvoiceController;
 use App\Http\Controllers\API\v1\StateOfAccountController;
 use App\Http\Controllers\API\v1\DashboardController;
+use App\Http\Controllers\API\v1\RoleController;
 
 //Route::get('/user', function (Request $request) {
 //    return $request->user();
@@ -35,6 +36,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/update_profile_image', [DashboardController::class, 'update_profile_image']);
     Route::post('/update_profile', [DashboardController::class, 'update_profile']);
     Route::post('/update_password', [DashboardController::class, 'update_password']);
+
+    // Roles and Permissions
+    // Route::post('/getRoles', [RoleController::class, 'getRoles'])->name('getRoles');
+    Route::get('/getRoles', [RoleController::class, 'getRoles'])->name('getRoles');
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
