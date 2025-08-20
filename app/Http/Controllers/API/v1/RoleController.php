@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\v1\RoleRequest;
 use App\Models\Role;
 use Illuminate\Http\Request;
 
@@ -13,9 +14,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        dd(123);
         $roles = Role::all();
-
         return response()->json($roles);
     }
 
@@ -38,9 +37,23 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RoleRequest $request)
     {
-        //
+        try{
+            $role = Role::create([
+                'name' => $request['name']
+            ]);
+
+            return response()->json([
+                'message' => 'Role added successfully',
+                'role' => $role
+            ]);
+        } catch(\Exception $e){
+            return response()->json([
+                'message' => 'There is an error while adding role, please try again',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**

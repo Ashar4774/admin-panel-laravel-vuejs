@@ -9,8 +9,8 @@
                                 <h5 class="mb-0">All Roles</h5>
                             </div>
                             <div class="d-flex flex-row">
-                                <a href="#" class="btn bg-gradient-primary btn-sm mb-0" id="addRole"
-                                    type="button">+&nbsp; New Role</a>
+                                <a href="#" class="btn bg-gradient-primary btn-sm mb-0" @click="openRoleAddModal"
+                                    id="addRole" type="button">+&nbsp; New Role</a>
                             </div>
                         </div>
                     </div>
@@ -39,15 +39,14 @@
                                                 class="" data-bs-toggle="tooltip" title="Assign Permission">
                                                 <i class="fa-solid fa-file-invoice text-secondary"></i>
                                             </router-link>
-                                            <a href="#" class="mx-3"
-                                                data-bs-toggle="tooltip" title="Edit Role" data-id="{{ role.id  }}">
+                                            <a href="#" class="mx-3" data-bs-toggle="tooltip" title="Edit Role"
+                                                data-id="{{ role.id  }}">
                                                 <i class="fas fa-user-edit text-secondary"></i>
                                             </a>
                                             <span>
-                                                <i class="cursor-pointer fas fa-trash text-secondary"
-                                                    id="deleteClient"
+                                                <i class="cursor-pointer fas fa-trash text-secondary" id="deleteClient"
                                                     data-bs-toggle="tooltip" title="Delete Role"
-                                                    data-id="{{ role.id  }}"></i>
+                                                    data-id="{{ role.id  }}" @click="openRoleDeleteModal"></i>
                                             </span>
                                         </td>
                                     </tr>
@@ -60,25 +59,164 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Role modal -->
+    <div v-if="isRoleAddModalOpen" class="modal" id="addRoleModel" aria-labelledby="addRoleModelLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addRoleModelLabel">Add Role</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeRoleAddModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="roleForm" @submit.prevent="AddRole">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="name" v-model="formState.name"
+                                        placeholder="e.g., admin, staff">
+                                    <span v-if="formState.errors.name" class="text-danger ps-2">{{ formState.errors.name
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn bg-gradient-secondary"
+                                @click="closeRoleAddModal">Close</button>
+                            <button type="submit" id="submitRoleBtn" class="btn bg-gradient-success">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Add Role modal -->
+
+     <!-- Delete Role modal -->
+      <div v-if="isRoleDeleteModalOpen" class="modal" id="addRoleModel" aria-labelledby="addRoleModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteRoleModelLabel">Delete Role</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeRoleDeleteModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" @submit.prevent="deleteRoleForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="Role_id" v-model="formState.id">
+                                    <p class="role_alert">{{role_alert}}</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <button type="button" class="btn bg-gradient-danger" @click="closeRoleDeleteModal">No</button>
+                            <button type="submit" id="deleteRoleBtn" class="btn bg-gradient-success">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+     <!-- End Delete Role modal -->
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import axios from '@/axios.js';
 
 const roles = ref([]);
+const formState = reactive({
+    id: '',
+    name: '',
+    errors: []
+});
 
 const FetchRoles = async () => {
     await axios.get('/api/getRoles')
         .then(response => {
             roles.value = response.data.roles;
-            console.log(response.data);
         }).catch(error => {
 
         });
 }
 
+// Add role module
+const isRoleAddModalOpen = ref(false);
+
+const openRoleAddModal = () => {
+    isRoleAddModalOpen.value = true;
+}
+
+const closeRoleAddModal = () => {
+    isRoleAddModalOpen.value = false;
+}
+
+const AddRole = async () => {
+    await axios.post('/api/roles', {
+        name: formState.name
+    }).then(response => {
+        formState.name = '';
+        FetchRoles();
+        closeRoleAddModal();
+    }).catch(error => {
+        if (error.response.status == 422) {
+            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                return acc;
+            }, {});
+        } else {
+            formState.errors = {
+                general: 'An unexpected error occurred. Please try again later.'
+            };
+        }
+    })
+}
+
+// Add role module
+
+// Delete role module
+const isRoleDeleteModalOpen = ref(false);
+const role_alert = ref('');
+const openRoleDeleteModal = () => {
+    isRoleDeleteModalOpen.value = true;
+}
+
+const closeRoleDeleteModal = () => {
+    isRoleDeleteModalOpen.value = false;
+}
+
+const deleteRoleForm = () => {
+
+}
+
+// Delete role module
 onMounted(() => {
     FetchRoles();
 })
 </script>
+<style scoped>
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+</style>

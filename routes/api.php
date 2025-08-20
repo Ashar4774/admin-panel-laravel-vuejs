@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function(){
     // Roles and Permissions
     // Route::post('/getRoles', [RoleController::class, 'getRoles'])->name('getRoles');
     Route::get('/getRoles', [RoleController::class, 'getRoles'])->name('getRoles');
+    Route::apiResource('roles', RoleController::class);
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
