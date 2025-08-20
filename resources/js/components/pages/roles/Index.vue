@@ -44,9 +44,10 @@
                                                 <i class="fas fa-user-edit text-secondary"></i>
                                             </a>
                                             <span>
-                                                <i class="cursor-pointer fas fa-trash text-secondary" id="deleteClient"
+                                                <i class="cursor-pointer fas fa-trash text-secondary delete-role-btn" id="deleteRole"
+                                                    @click="deleteRole(role.id)"
                                                     data-bs-toggle="tooltip" title="Delete Role"
-                                                    data-id="{{ role.id  }}" @click="openRoleDeleteModal"></i>
+                                                    data-id="{{ role.id }}"></i>
                                             </span>
                                         </td>
                                     </tr>
@@ -114,7 +115,10 @@
                             </div>
 
                         </div>
-                        <div>
+                        <div v-if="formState.name == 'admin'">
+                            <button type="button" class="btn bg-gradient-danger" @click="closeRoleDeleteModal">ok</button>
+                        </div>
+                        <div v-else>
                             <button type="button" class="btn bg-gradient-danger" @click="closeRoleDeleteModal">No</button>
                             <button type="submit" id="deleteRoleBtn" class="btn bg-gradient-success">Yes</button>
                         </div>
@@ -183,16 +187,30 @@ const AddRole = async () => {
 // Delete role module
 const isRoleDeleteModalOpen = ref(false);
 const role_alert = ref('');
-const openRoleDeleteModal = () => {
-    isRoleDeleteModalOpen.value = true;
-}
 
-const closeRoleDeleteModal = () => {
-    isRoleDeleteModalOpen.value = false;
+const deleteRole = async (id) => {
+    formState.id = id;
+    await axios.get(`/api/roles/${id}`)
+    .then(response=>{
+        formState.name = response.data.role.name;
+        if(response.data.role.name == 'admin'){
+            role_alert.value = `You are not able to delete ${formState.name} role?`
+            isRoleDeleteModalOpen.value = true;
+        } else {
+            role_alert.value = `Do you really want to delete ${formState.name} role?`
+            isRoleDeleteModalOpen.value = true;
+        }
+    }).catch(error=>{
+        console.error(error);
+    });
 }
 
 const deleteRoleForm = () => {
 
+}
+
+const closeRoleDeleteModal = () => {
+    isRoleDeleteModalOpen.value = false;
 }
 
 // Delete role module

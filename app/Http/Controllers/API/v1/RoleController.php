@@ -59,9 +59,13 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $role = Role::whereId($id)->first();
+
+        return response()->json([
+            'role' => $role
+        ]);
     }
 
     /**
