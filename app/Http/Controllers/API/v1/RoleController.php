@@ -79,16 +79,42 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(RoleRequest $request, $id)
     {
-        //
+        try {
+            $role= Role::findOrFail($id);
+            $role->update([
+                'name' => $request['name']
+            ]);
+            return response()->json([
+                'message' => 'Role updated successfully',
+                'role' => $role
+            ], 201);
+        } catch(\Exception $e){
+            return response()->json([
+                'message' => 'There is an error while updating role details. Please try again',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        try {
+            $role = Role::findOrFail($id);
+            $role->delete();
+
+            return response()->json([
+                'message' => 'Role has been deleted successfully'
+            ], 201);
+        } catch(\Exception $e) {
+            return response()->json([
+                'message' => 'There is an error while deleting role. Please try again',
+                'error' =>  $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -40,12 +40,12 @@
                                                 <i class="fa-solid fa-file-invoice text-secondary"></i>
                                             </router-link>
                                             <a href="#" class="mx-3" data-bs-toggle="tooltip" title="Edit Role"
-                                                data-id="{{ role.id  }}">
+                                                @click="updateRole(role.id)">
                                                 <i class="fas fa-user-edit text-secondary"></i>
                                             </a>
                                             <span>
-                                                <i class="cursor-pointer fas fa-trash text-secondary delete-role-btn" id="deleteRole"
-                                                    @click="deleteRole(role.id)"
+                                                <i class="cursor-pointer fas fa-trash text-secondary delete-role-btn"
+                                                    id="deleteRole" @click="deleteRole(role.id)"
                                                     data-bs-toggle="tooltip" title="Delete Role"
                                                     data-id="{{ role.id }}"></i>
                                             </span>
@@ -95,8 +95,43 @@
     </div>
     <!-- End Add Role modal -->
 
-     <!-- Delete Role modal -->
-      <div v-if="isRoleDeleteModalOpen" class="modal" id="addRoleModel" aria-labelledby="addRoleModelLabel" aria-hidden="true">
+    <!-- Edit Role modal -->
+     <div v-if="isRoleUpdateModalOpen" class="modal" id="updateRoleModel" aria-labelledby="updateRoleModelLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateRoleModelLabel">Update Role</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closeRoleUpdateModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="roleForm" @submit.prevent="UpdateRoleForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="name" v-model="formState.name"
+                                        placeholder="e.g., admin, staff">
+                                    <span v-if="formState.errors.name" class="text-danger ps-2">{{ formState.errors.name
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn bg-gradient-secondary"
+                                @click="closeRoleUpdateModal">Close</button>
+                            <button type="submit" id="submitRoleBtn" class="btn bg-gradient-success">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Edit Role modal -->
+
+    <!-- Delete Role modal -->
+    <div v-if="isRoleDeleteModalOpen" class="modal" id="deleteRoleModel" aria-labelledby="deleteRoleModelLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -110,16 +145,18 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <input type="hidden" class="form-control" id="Role_id" v-model="formState.id">
-                                    <p class="role_alert">{{role_alert}}</p>
+                                    <p class="role_alert">{{ role_alert }}</p>
                                 </div>
                             </div>
 
                         </div>
                         <div v-if="formState.name == 'admin'">
-                            <button type="button" class="btn bg-gradient-danger" @click="closeRoleDeleteModal">ok</button>
+                            <button type="button" class="btn bg-gradient-danger"
+                                @click="closeRoleDeleteModal">ok</button>
                         </div>
                         <div v-else>
-                            <button type="button" class="btn bg-gradient-danger" @click="closeRoleDeleteModal">No</button>
+                            <button type="button" class="btn bg-gradient-danger"
+                                @click="closeRoleDeleteModal">No</button>
                             <button type="submit" id="deleteRoleBtn" class="btn bg-gradient-success">Yes</button>
                         </div>
                     </form>
@@ -127,7 +164,7 @@
             </div>
         </div>
     </div>
-     <!-- End Delete Role modal -->
+    <!-- End Delete Role modal -->
 </template>
 
 <script setup>
@@ -158,6 +195,7 @@ const openRoleAddModal = () => {
 }
 
 const closeRoleAddModal = () => {
+    formState.name = '';
     isRoleAddModalOpen.value = false;
 }
 
@@ -184,6 +222,56 @@ const AddRole = async () => {
 
 // Add role module
 
+// Update role module
+const isRoleUpdateModalOpen = ref(false);
+
+const updateRole = async (id) => {
+    formState.id = id;
+    await axios.get(`/api/roles/${id}`)
+    .then(response => {
+        formState.name = response.data.role.name;
+        isRoleUpdateModalOpen.value = true;
+    }).catch(error=>{
+        if (error.response.status == 422) {
+            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                return acc;
+            }, {});
+        } else {
+            formState.errors = {
+                general: 'An unexpected error occurred. Please try again later.'
+            };
+        }
+    })
+}
+
+const UpdateRoleForm = async () => {
+    await axios.put(`/api/roles/${formState.id}`, {
+        name: formState.name
+    }).then(response=>{
+        FetchRoles();
+        formState.name = '';
+        closeRoleUpdateModal();
+    }).catch(error=>{
+        if (error.response.status == 422) {
+            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                return acc;
+            }, {});
+        } else {
+            formState.errors = {
+                general: 'An unexpected error occurred. Please try again later.'
+            };
+        }
+    })
+}
+
+const closeRoleUpdateModal = () => {
+    formState.name = '';
+    isRoleUpdateModalOpen.value = false;
+}
+// Update role module
+
 // Delete role module
 const isRoleDeleteModalOpen = ref(false);
 const role_alert = ref('');
@@ -191,22 +279,39 @@ const role_alert = ref('');
 const deleteRole = async (id) => {
     formState.id = id;
     await axios.get(`/api/roles/${id}`)
-    .then(response=>{
-        formState.name = response.data.role.name;
-        if(response.data.role.name == 'admin'){
-            role_alert.value = `You are not able to delete ${formState.name} role?`
-            isRoleDeleteModalOpen.value = true;
-        } else {
-            role_alert.value = `Do you really want to delete ${formState.name} role?`
-            isRoleDeleteModalOpen.value = true;
-        }
-    }).catch(error=>{
-        console.error(error);
-    });
+        .then(response => {
+            formState.name = response.data.role.name;
+            if (response.data.role.name == 'admin') {
+                role_alert.value = `You are not able to delete ${formState.name} role?`
+                isRoleDeleteModalOpen.value = true;
+            } else {
+                role_alert.value = `Do you really want to delete ${formState.name} role?`
+                isRoleDeleteModalOpen.value = true;
+            }
+        }).catch(error => {
+            console.error(error);
+        });
 }
 
-const deleteRoleForm = () => {
-
+const deleteRoleForm = async () => {
+    await axios.delete(`/api/roles/${formState.id}`)
+        .then(response => {
+            if (response.status === 201) {
+                FetchRoles();
+                closeRoleDeleteModal();
+            }
+        }).catch(error => {
+            if (error.response.status == 422) {
+                formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                    acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            } else {
+                formState.errors = {
+                    general: 'An unexpected error occurred. Please try again later.'
+                };
+            }
+        })
 }
 
 const closeRoleDeleteModal = () => {
