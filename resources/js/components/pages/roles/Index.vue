@@ -79,7 +79,7 @@
                                     <input type="text" class="form-control" id="name" v-model="formState.name"
                                         placeholder="e.g., admin, staff">
                                     <span v-if="formState.errors.name" class="text-danger ps-2">{{ formState.errors.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
     <!-- End Add Role modal -->
 
     <!-- Edit Role modal -->
-     <div v-if="isRoleUpdateModalOpen" class="modal" id="updateRoleModel" aria-labelledby="updateRoleModelLabel"
+    <div v-if="isRoleUpdateModalOpen" class="modal" id="updateRoleModel" aria-labelledby="updateRoleModelLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -113,7 +113,7 @@
                                     <input type="text" class="form-control" id="name" v-model="formState.name"
                                         placeholder="e.g., admin, staff">
                                     <span v-if="formState.errors.name" class="text-danger ps-2">{{ formState.errors.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -183,7 +183,12 @@ const FetchRoles = async () => {
         .then(response => {
             roles.value = response.data.roles;
         }).catch(error => {
-
+            if (error.response.status == 422) {
+                formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                    acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            }
         });
 }
 
@@ -228,31 +233,31 @@ const isRoleUpdateModalOpen = ref(false);
 const updateRole = async (id) => {
     formState.id = id;
     await axios.get(`/api/roles/${id}`)
-    .then(response => {
-        formState.name = response.data.role.name;
-        isRoleUpdateModalOpen.value = true;
-    }).catch(error=>{
-        if (error.response.status == 422) {
-            formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
-                acc[field] = error.response.data.errors[field][0]; // Get the first error message
-                return acc;
-            }, {});
-        } else {
-            formState.errors = {
-                general: 'An unexpected error occurred. Please try again later.'
-            };
-        }
-    })
+        .then(response => {
+            formState.name = response.data.role.name;
+            isRoleUpdateModalOpen.value = true;
+        }).catch(error => {
+            if (error.response.status == 422) {
+                formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
+                    acc[field] = error.response.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            } else {
+                formState.errors = {
+                    general: 'An unexpected error occurred. Please try again later.'
+                };
+            }
+        })
 }
 
 const UpdateRoleForm = async () => {
     await axios.put(`/api/roles/${formState.id}`, {
         name: formState.name
-    }).then(response=>{
+    }).then(response => {
         FetchRoles();
         formState.name = '';
         closeRoleUpdateModal();
-    }).catch(error=>{
+    }).catch(error => {
         if (error.response.status == 422) {
             formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
                 acc[field] = error.response.data.errors[field][0]; // Get the first error message

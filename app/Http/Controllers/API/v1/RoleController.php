@@ -20,10 +20,17 @@ class RoleController extends Controller
 
     public function getRoles()
     {
-        $roles = Role::get();
-        return [
-            'roles' => $roles
-        ];
+        try {
+            $roles = Role::get();
+            return response()->json([
+                'roles' => $roles
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is an error while showing roles, please try again',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -39,7 +46,7 @@ class RoleController extends Controller
      */
     public function store(RoleRequest $request)
     {
-        try{
+        try {
             $role = Role::create([
                 'name' => $request['name']
             ]);
@@ -48,7 +55,7 @@ class RoleController extends Controller
                 'message' => 'Role added successfully',
                 'role' => $role
             ]);
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'There is an error while adding role, please try again',
                 'error' => $e->getMessage()
@@ -82,7 +89,7 @@ class RoleController extends Controller
     public function update(RoleRequest $request, $id)
     {
         try {
-            $role= Role::findOrFail($id);
+            $role = Role::findOrFail($id);
             $role->update([
                 'name' => $request['name']
             ]);
@@ -90,7 +97,7 @@ class RoleController extends Controller
                 'message' => 'Role updated successfully',
                 'role' => $role
             ], 201);
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'There is an error while updating role details. Please try again',
                 'error' => $e->getMessage()
@@ -110,7 +117,7 @@ class RoleController extends Controller
             return response()->json([
                 'message' => 'Role has been deleted successfully'
             ], 201);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'There is an error while deleting role. Please try again',
                 'error' =>  $e->getMessage()
