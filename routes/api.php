@@ -7,6 +7,7 @@ use App\Http\Controllers\API\v1\ClientController;
 use App\Http\Controllers\API\v1\InvoiceController;
 use App\Http\Controllers\API\v1\StateOfAccountController;
 use App\Http\Controllers\API\v1\DashboardController;
+use App\Http\Controllers\API\v1\PermissionController;
 use App\Http\Controllers\API\v1\RoleController;
 
 //Route::get('/user', function (Request $request) {
@@ -41,6 +42,11 @@ Route::middleware('auth:sanctum')->group(function(){
     // Route::post('/getRoles', [RoleController::class, 'getRoles'])->name('getRoles');
     Route::get('/getRoles', [RoleController::class, 'getRoles'])->name('getRoles');
     Route::apiResource('roles', RoleController::class);
+
+    Route::get('/getPermissions', [PermissionController::class, 'getPermissions'])->name('getPermissions');
+    Route::apiResource('permissions', PermissionController::class);
+
+
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
@@ -13,6 +14,22 @@ class PermissionController extends Controller
     public function index()
     {
         //
+    }
+
+    public function getPermissions()
+    {
+        try {
+            $permissions = Permission::get();
+
+            return response()->json([
+                'permissions' => $permissions
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is an error while showing permissions, please try again',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
