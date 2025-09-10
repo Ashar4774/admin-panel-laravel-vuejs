@@ -45,15 +45,33 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $permission = Permission::create([
+                'name' => $request['name']
+            ]);
+
+            return response()->json([
+                'message' => 'Permission added successfully',
+                'permission' => $permission
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is an error while adding permission, please try again',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $permission = Permission::whereId($id)->first();
+
+        return response()->json([
+            'permission' => $permission
+        ]);
     }
 
     /**
