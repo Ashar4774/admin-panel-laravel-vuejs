@@ -79,7 +79,7 @@
                                     <input type="text" class="form-control" id="name" v-model="formState.name"
                                         placeholder="can-edit, can-delete">
                                     <span v-if="formState.errors.name" class="text-danger ps-2">{{ formState.errors.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                                     <input type="text" class="form-control" id="name" v-model="formState.name"
                                         placeholder="e.g., admin, staff">
                                     <span v-if="formState.errors.name" class="text-danger ps-2">{{ formState.errors.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -129,6 +129,43 @@
         </div>
     </div>
     <!-- End Update permission modal -->
+
+    <!-- Delete permission modal -->
+    <div v-if="isPermissionDeleteModalOpen" class="modal" id="deletePermissionModel"
+        aria-labelledby="deletePermissionModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePermissionModelLabel">Delete Permission</h5>
+                    <button type="button" class="btn-close bg-dark" @click="closePermissionDeleteModal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" @submit.prevent="deletePermissionForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="permission_id" v-model="formState.id">
+                                    <p class="role_alert">{{ permission_alert }}</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div v-if="formState.name == 'admin'">
+                            <button type="button" class="btn bg-gradient-danger"
+                                @click="closePermissionDeleteModal">ok</button>
+                        </div>
+                        <div v-else>
+                            <button type="button" class="btn bg-gradient-danger"
+                                @click="closePermissionDeleteModal">No</button>
+                            <button type="submit" id="deletePermissionBtn" class="btn bg-gradient-success">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Delete permission modal -->
 </template>
 
 <script setup>
@@ -215,13 +252,13 @@ const updatePermission = async (id) => {
 
 const UpdatePermissionForm = async () => {
     formState.name.replace(/ /g, '-');
-    await axios.put(`/api/permissions/${formState.id}`,{
+    await axios.put(`/api/permissions/${formState.id}`, {
         name: formState.name
-    }).then(response=>{
+    }).then(response => {
         FetchPermissions();
         formState.name = '';
         closePermissionUpdateModal();
-    }).catch(error=>{
+    }).catch(error => {
         if (error.response.status == 422) {
             formState.errors = Object.keys(error.response.data.errors).reduce((acc, field) => {
                 acc[field] = error.response.data.errors[field][0]; // Get the first error message
@@ -237,6 +274,56 @@ const UpdatePermissionForm = async () => {
 
 const closePermissionUpdateModal = () => {
     isPermissionUpdateModalOpen.value = false;
+}
+
+// Delete permission module
+const isPermissionDeleteModalOpen = ref(false);
+const permission_alert = ref('');
+
+const deleteRole = async (id) => {
+    formState.id = id;
+    await axios.get(`/api/permissions/${id}`)
+        .then(response => {
+            formState.name = response.data.permission.name.replace(/-/g, ' ');
+            isPermissionDeleteModalOpen.value = true;
+        }).catch(error => {
+            console.error(error);
+            if (error.status == 422) {
+                formState.errors = Object.keys(error.data.errors).reduce((acc, field) => {
+                    acc[field] = error.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            } else {
+                formState.errors = {
+                    general: 'An unexpected error occurred. Please try again later.'
+                };
+            }
+        })
+}
+
+const deletePermissionForm = async () => {
+    await axios.delete(`/api/permissions/${formState.id}`)
+        .then(response => {
+            if (response.status === 201) {
+                FetchPermissions();
+                closePermissionDeleteModal();
+            }
+        }).catch(error => {
+            if (error.response.status == 422) {
+                formState.errors = Object.keys(error.data.errors).reduce((acc, field) => {
+                    acc[field] = error.data.errors[field][0]; // Get the first error message
+                    return acc;
+                }, {});
+            } else {
+                formState.errors = {
+                    general: 'An unexpected error occurred. Please try again later.'
+                };
+            }
+        })
+}
+
+const closePermissionDeleteModal = () => {
+    isPermissionDeleteModalOpen.value = false;
 }
 
 onMounted(() => {

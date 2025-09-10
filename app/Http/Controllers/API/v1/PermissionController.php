@@ -87,7 +87,21 @@ class PermissionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $permission = Permission::findOrFail($id);
+            $permission->update([
+                'name' => $request['name']
+            ]);
+            return response()->json([
+                'message' => 'Permission updated successfully',
+                'permission' => $permission
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There is an error while updating permission details. Please try again',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
